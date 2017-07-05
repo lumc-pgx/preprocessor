@@ -3,3 +3,9 @@ __default__:
   threads: 1
   vmem: 4G
   queue: all.q
+
+laa:
+  job_name: LAA
+  threads: 8
+  vmem: 3G
+  queue: all.q
