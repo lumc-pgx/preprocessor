@@ -1,0 +1,5 @@
+__default__:
+  job_name: amplicon_pipeline
+  threads: 1
+  vmem: 4G
+  queue: all.q

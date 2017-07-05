@@ -1,0 +1,5 @@
+SOURCE_DATA_PATH: /data/LGTC/equipment/PacBio/rundata/RV_26022015_176/A02_1/Analysis_Results
+BARCODES: /home/wgallard/MyData/smrtpipe_test/barcodes.fasta
+GENOME: /home/wgallard/MyData/smrtpipe_test/GRCh38/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
+SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
+CCS_CHECK_PATH: /home/wgallard/MyData/pacbio_tools/ccs_check
