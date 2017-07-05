@@ -3,4 +3,4 @@ channels:
 dependencies:
   - python=3.5
   - snakemake=3.11.2
-
+  - biopython=1.69

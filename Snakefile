@@ -3,10 +3,12 @@ configfile: srcdir("config.yaml")
 
 import os
 import glob
+from Bio import SeqIO
 
 RS2_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bax.h5")
 SEQUEL_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bam")
-
+MOVIE = os.path.basename((RS2_BASECALLS + SEQUEL_BASECALLS)[0]).split(".")[0]
+BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
 
 # handlers for workflow exit status
 onsuccess:
@@ -18,7 +20,7 @@ onerror:
 
 rule all:
     input:
-        "barcoded_subreads/m150227_003039_42162_c100786542550000001823153608251501_s1_p0.subreads.bam"
+        "demultiplexed/{}.xml".format(BARCODE_IDS[0])
 
 
 rule source_data:
@@ -62,4 +64,19 @@ rule barcoding:
         mkdir -p barcoded_subreads &&   
         {params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}
         """
+
+
+rule demultiplex:
+    """
+    Create a single bam file for each barcode
+    """
+    input:
+        "barcoded_subreads/{}.subreadset.xml".format(MOVIE)
+    output:
+        expand("demultiplexed/{bc_id}.xml", bc_id=BARCODE_IDS)
+    run:
+        shell("mkdir -p demultiplexed")
+        for i, bc in enumerate(BARCODE_IDS):
+            outfile = output[i]
+            shell("dataset filter {input} {outfile} 'bc=[{i},{i}]'")
 
