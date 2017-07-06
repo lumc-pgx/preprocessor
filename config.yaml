@@ -14,11 +14,19 @@ GENOME: /home/wgallard/MyData/smrtpipe_test/GRCh38/GRCh38_no_alt_analysis_set/se
 SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
 
 # Path to the ccs_check tool
-CCS_CHECK_PATH: /home/wgallard/MyData/pacbio_tools/ccs_check
+CCS_CHECK_PATH: /home/wgallard/MyData/pacbio_tools/ccscheck
 
 # LAA parameters
 LAA_PARAMS:
   - trimEnds: 21
   - ignoreEnds: 21
-  - fullLength: False
-  - minLength: 6000 
+  - fullLength
+  - minLength: 6000
+
+# CCS parameters
+CCS_PARAMS:
+  - minLength: 6000
+  - maxLength: 7000
+  - minPasses: 1
+  - minPredictedAccuracy: 0.75
+ 

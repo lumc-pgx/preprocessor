@@ -1,11 +1,30 @@
+# Default parameters for jobs
 __default__:
   job_name: amplicon_pipeline
   threads: 1
   vmem: 4G
   queue: all.q
 
+# Parameters specific to LAA
+# LAA is computationally intensive
 laa:
   job_name: LAA
-  threads: 8
-  vmem: 3G
+  threads: 2
+  vmem: 12G
   queue: all.q
+
+# parameters specific to CCS
+# CCS is less resource intensive than LAA but still
+ccs:
+  job_name: CCS
+  threads: 2
+  vmem: 6G
+  queue: all.q
+
+# Parameters for ccs_check
+ccs_check:
+  job_name: ccs_check
+  threads: 1
+  vmem: 8G
+  queue: all.q
+

@@ -1,22 +1,36 @@
 # load config file
 configfile: srcdir("config.yaml")
 
+# imports
 import os
 import glob
 from Bio import SeqIO
 
+# globals
 RS2_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bax.h5")
 SEQUEL_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bam")
 MOVIE = os.path.basename((RS2_BASECALLS + SEQUEL_BASECALLS)[0]).split(".")[0]
 BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
 
 
-def tool_param_string(config_key):
+# utility functions
+def parse_param(config_entry):
     """
-    Return a string containing tool parameters from the config,
-    formatted for feeding to a command line tool
+    Parse a config entry from the config file
     """
-    return " ".join(["--"+" ".join([str(x) for x in list(i.items())[0] if x]) for i in config[config_key]])
+    try:
+        return list(config_entry.items())[0]
+    except AttributeError:
+        return [config_entry]
+
+
+def tool_param_string(config_dict):
+    """
+    Convert config settings to a parameter string for feeding to command line tools
+    :param config_dict: portion of the config which contains the params
+    :return: A string containing the formatted parameters
+    """
+    return " ".join(["--"+" ".join([str(x) for x in parse_param(i)]) for i in config_dict])
 
 
 # handlers for workflow exit status
@@ -27,9 +41,13 @@ onerror:
     shell("cat {log}")
 
 
+# main workflow
 rule all:
     input:
-        expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS)
+        expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),
+        expand("CCS/{barcodes}.bam", barcodes=BARCODE_IDS),
+        #expand("ccs_check/{barcodes}/snrs.csv", barcodes=BARCODE_IDS)
+        "ccs_check/PB_M13F_01/snrs.csv"
 
 
 rule source_data:
@@ -117,12 +135,13 @@ rule laa:
         input_report = "LAA/{barcode}_input.csv",
         subread_report = "LAA/subreads.{barcode}--{barcode}.csv"
     params:
+        laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "LAA/subreads",
-        laa_params = tool_param_string("LAA_PARAMS")
+        laa_params = tool_param_string(config["LAA_PARAMS"])
     shell:
         "echo {params.laa_params} && "
         "mkdir -p LAA && "
-        "laa {params.laa_params} "
+        "{params.laa} {params.laa_params} "
         "--barcodes {input.barcodes} "
         "--resultFile {output.results} "
         "--junkFile {output.noise} "
@@ -130,4 +149,44 @@ rule laa:
         "--inputReportFile {output.input_report} "
         "--subreadsReportPrefix {params.subread_prefix} "
         "{input.bam}"
-        
+
+
+rule ccs:
+    """
+    Run CCS
+    """
+    input:
+        "demultiplexed/{barcode}.bam"
+    output:
+        bam = "CCS/{barcode}.bam",
+        report = "CCS/{barcode}.report.csv"
+    params:
+        ccs = config["SMRTCMD_PATH"] + "/ccs",
+        ccs_params = tool_param_string(config["CCS_PARAMS"])
+    shell:
+        "echo {params.ccs_params} && "
+        "mkdir -p CCS && "
+        "{params.ccs} {params.ccs_params} --reportFile {output.report} "
+        "{input} {output.bam}"
+
+
+rule ccs_check:
+    """
+    Run ccs_check to analyze the ccs results
+    """
+    input:
+        bam = os.path.abspath("CCS/{barcode}.bam"),
+        genome = os.path.abspath(config["GENOME"])
+    output:
+        "ccs_check/{barcode}/qv_calibration.csv",
+        "ccs_check/{barcode}/snrs.csv",
+        "ccs_check/{barcode}/variants.csv",
+        "ccs_check/{barcode}/zmws.csv",
+        "ccs_check/{barcode}/zscores.csv"
+    params:
+        ccs_check_dir = config["CCS_CHECK_PATH"],
+        ccs_check = config["CCS_CHECK_PATH"] + "/ccscheck"
+    shell:
+        "mkdir -p ccs_check && cd ccs_check && rm -rf {wildcards.barcode} && "
+        "export LD_LIBRARY_PATH={params.ccs_check_dir}:$LD_LIBRARY_PATH && "
+        "{params.ccs_check} {input.bam} {wildcards.barcode} {input.genome}"
