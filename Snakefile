@@ -94,10 +94,8 @@ rule barcoding:
     params:
         bam2bam = config["SMRTCMD_PATH"] + "/bam2bam"
     shell:
-        """
-        mkdir -p barcoded_subreads &&   
-        {params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}
-        """
+        "mkdir -p barcoded_subreads && "
+        "{params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}"
 
 rule merge:
     """
