@@ -1,19 +1,27 @@
 # Pipeline Configuration
 
-# Path to the folder which contains the sequencing output
-SOURCE_DATA_PATH: /data/LGTC/equipment/PacBio/rundata/RV_26022015_176/A02_1/Analysis_Results
+# Flag to indicate which platform the data was sequenced on
+# SEQUENCING_PLATFORM must be either RS2 or SEQUEL
+SEQUENCING_PLATFORM: RS2
+
+# Path to the folders which contains the sequencing output for each cell
+SOURCE_DATA_PATHS:
+  - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A02_1/Analysis_Results
+  - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A01_1/Analysis_Results
 
 # Path to barcode fasta file used for demultiplexing
-BARCODES: /home/wgallard/MyData/smrtpipe_test/barcodes.fasta
+BARCODES: /usr/local/smrtanalysis/current/common/references/pacbio_barcodes_96/sequence/pacbio_barcodes_96.fasta
 
 # Path to the genome fasta file to be used for mapping/alignment
-# The location of this file should be writable so that indexes
+# The location of this file should be writable so that indexes can be created
+# TODO - put this somewhere accessible by other users
 GENOME: /home/wgallard/MyData/smrtpipe_test/GRCh38/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
 
 # Path to the folder containing the smrt command executables
 SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
 
 # Path to the ccs_check tool
+# TODO - ask Michel to install this system-wide
 CCS_CHECK_PATH: /home/wgallard/MyData/pacbio_tools/ccscheck
 
 # LAA parameters

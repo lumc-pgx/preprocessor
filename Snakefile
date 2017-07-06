@@ -7,9 +7,15 @@ import glob
 from Bio import SeqIO
 
 # globals
-RS2_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bax.h5")
-SEQUEL_BASECALLS = glob.glob(config["SOURCE_DATA_PATH"] + "/*.bam")
-MOVIE = os.path.basename((RS2_BASECALLS + SEQUEL_BASECALLS)[0]).split(".")[0]
+PLATFORM = config["SEQUENCING_PLATFORM"].upper()
+assert PLATFORM in ("RS2", "SEQUEL"), "Invalid sequencing platform specified"
+
+if PLATFORM == "RS2":
+    BASECALLS = [sorted(glob.glob(pth + "/*.bax.h5")) for pth in config["SOURCE_DATA_PATHS"]]
+else:
+    BASECALLS = [sorted(glob.glob(pth + "/*.bam")) for pth in config["SOURCE_DATA_PATHS"]]
+
+MOVIES = [os.path.basename(BASECALLS[i][0]).split(".")[0] for i in range(len(BASECALLS))]
 BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
 
 
@@ -44,8 +50,10 @@ onerror:
 # main workflow
 rule all:
     input:
-        expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),
-        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS)
+        #"barcoded_subreads/merged.subreadset.xml" # runs pipeline up to merge stage
+        expand("demultiplexed/{bc_id}.bam", bc_id=BARCODE_IDS) # run pipeline up to consolidate stage
+        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),
+        #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS)
 
 
 rule source_data:
@@ -54,7 +62,7 @@ rule source_data:
     Convert RS2 format bax.h5 to sequel bam if required
     """
     input:
-        sorted(RS2_BASECALLS) if len(RS2_BASECALLS) == 3 else SEQUEL_BASECALLS
+        lambda wildcards: BASECALLS[MOVIES.index(wildcards.moviename)]
     output:
         "basecalls/{moviename}.subreads.bam",
         "basecalls/{moviename}.scraps.bam"
@@ -62,11 +70,11 @@ rule source_data:
         bax2bam = config["SMRTCMD_PATH"] + "/bax2bam"
     run:
         shell("mkdir -p basecalls")
-        if len(RS2_BASECALLS) == 3:
+        if PLATFORM == "RS2":
             shell("cd basecalls && {params.bax2bam} -o {wildcards.moviename} {input}")
         else:
-            subreads = next(f for f in SEQUEL_BASECALLS if f.endswith("subreads.bam"))
-            scraps = next(f for f in SEQUEL_BASECALLS if f.endswith("scraps.bam"))
+            subreads = next(f for f in input if f.endswith("subreads.bam"))
+            scraps = next(f for f in input if f.endswith("scraps.bam"))
             shell("ln -s {subreads} {output[0]}")
             shell("ln -s {scraps}   {output[1]}")
 
@@ -91,20 +99,35 @@ rule barcoding:
         {params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}
         """
 
+rule merge:
+    """
+    Merge barcoded subreads from multiple movies into a single bam file
+    """
+    input:
+        expand("barcoded_subreads/{movie}.subreadset.xml", movie=MOVIES)
+    output:
+        "barcoded_subreads/merged.subreadset.xml"
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset"
+    shell:
+        "{params.dataset} merge {output} {input}"
+
 
 rule demultiplex:
     """
     Create a single bam file for each barcode
     """
     input:
-        "barcoded_subreads/{}.subreadset.xml".format(MOVIE)
+        "barcoded_subreads/merged.subreadset.xml"
     output:
         expand("demultiplexed/{bc_id}.xml", bc_id=BARCODE_IDS)
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset"
     run:
         shell("mkdir -p demultiplexed")
         for i, bc in enumerate(BARCODE_IDS):
             outfile = output[i]
-            shell("dataset filter {input} {outfile} 'bc=[{i},{i}]'")
+            shell("{params.dataset} filter {input} {outfile} 'bc=[{i},{i}]'")
 
 
 rule consolidate:
@@ -115,8 +138,10 @@ rule consolidate:
         "{stage}/{barcode}.xml"
     output:
         "{stage}/{barcode}.bam"
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset"
     shell:
-        "dataset consolidate {input} {output} {input}"
+        "{params.dataset} consolidate {input} {output} {input}"
 
 
 rule laa:
