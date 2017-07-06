@@ -45,9 +45,7 @@ onerror:
 rule all:
     input:
         expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),
-        expand("CCS/{barcodes}.bam", barcodes=BARCODE_IDS),
-        #expand("ccs_check/{barcodes}/snrs.csv", barcodes=BARCODE_IDS)
-        "ccs_check/PB_M13F_01/snrs.csv"
+        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS)
 
 
 rule source_data:
