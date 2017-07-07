@@ -1,7 +1,14 @@
 # Preprocessor
 
-Initial data processing for PacBio data.  
-Generates amplicon sequences and associated metrics.
+*Initial data processing for PacBio amplicon data.*  
+
+The preprocessor module performs the following operations:  
+- Combine raw data from multiple SMRT cells associated with a single experiment.
+- Barcoding
+- Demultiplexing
+- Long amplicon analysis (LAA2)
+- Circular consensus sequence (CCS2)
+- Comparison of LAA and CCS features  
 
 ## Requirements
 - [Conda/Miniconda](https://conda.io/miniconda.html)  
@@ -25,5 +32,5 @@ Pipeline configuration settings can be altered by editing [config.yaml](config.y
 - Activate the conda environment
   - `source activate preprocessor`
 - For parallel execution on the cluster
-  - `run_cluster.sh`
+  - `./run_cluster.sh`
 
