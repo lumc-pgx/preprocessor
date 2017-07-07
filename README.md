@@ -22,5 +22,8 @@ Generates amplicon sequences and associated metrics.
 Pipeline configuration settings can be altered by editing [config.yaml](config.yaml).  
 
 ## Execution
-- For parallel execution on the cluster, run `run_cluster.sh`
-- For execution in a single thread, run `run_local.sh`
+- Activate the conda environment
+  - `source activate preprocessor`
+- For parallel execution on the cluster
+  - `run_cluster.sh`
+
