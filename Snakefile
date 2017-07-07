@@ -46,12 +46,11 @@ onerror:
     print("Error encountered while executing workflow")
     shell("cat {log}")
 
+
 # main workflow
 rule all:
     input:
-        #"merged_subreads/merged.subreadset.xml" # runs pipeline up to merge stage
-        #expand("consolidated/{bc_id}.bam", bc_id=BARCODE_IDS) # run pipeline up to consolidate stage
-        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS), # run pipeline up to LAA stage
+        expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),             # run pipeline up to LAA stage
         expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS) # run CCS and ccs_check
 
 
@@ -158,16 +157,22 @@ rule laa:
         laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "LAA/subreads",
         laa_params = tool_param_string(config["LAA_PARAMS"])
-    shell:
-        "{params.laa} {params.laa_params} "
-        "--barcodes {input.barcodes} "
-        "--resultFile {output.results} "
-        "--junkFile {output.noise} "
-        "--reportFile {output.report} "
-        "--inputReportFile {output.input_report} "
-        "--subreadsReportPrefix {params.subread_prefix} "
-        "{input.bam}"
-
+    run:
+        shell(
+            "{params.laa} {params.laa_params} "
+            "--barcodes {input.barcodes} "
+            "--resultFile {output.results} "
+            "--junkFile {output.noise} "
+            "--reportFile {output.report} "
+            "--inputReportFile {output.input_report} "
+            "--subreadsReportPrefix {params.subread_prefix} "
+            "{input.bam}")
+        # LAA does not create output files if no amplicons were constructed
+        # Create empty files here for those cases
+        for output_file in output:
+            if not os.path.isfile(output_file):
+                shell("touch {output_file}")
+        
 
 rule ccs:
     """
