@@ -4,7 +4,7 @@
 # SEQUENCING_PLATFORM must be either RS2 or SEQUEL
 SEQUENCING_PLATFORM: RS2
 
-# Path to the folders which contains the sequencing output for each cell
+# Path to the folders which contain the sequencing output for each cell
 SOURCE_DATA_PATHS:
   - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A02_1/Analysis_Results
   - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A01_1/Analysis_Results

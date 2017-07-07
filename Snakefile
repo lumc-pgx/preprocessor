@@ -41,19 +41,18 @@ def tool_param_string(config_dict):
 
 # handlers for workflow exit status
 onsuccess:
-    print("Pharmacogenomics preprocessing workflow completed successfully")
+    print("Preprocessing workflow completed successfully")
 onerror:
     print("Error encountered while executing workflow")
     shell("cat {log}")
 
-
 # main workflow
 rule all:
     input:
-        #"barcoded_subreads/merged.subreadset.xml" # runs pipeline up to merge stage
-        expand("demultiplexed/{bc_id}.bam", bc_id=BARCODE_IDS) # run pipeline up to consolidate stage
-        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),
-        #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS)
+        #"merged_subreads/merged.subreadset.xml" # runs pipeline up to merge stage
+        #expand("consolidated/{bc_id}.bam", bc_id=BARCODE_IDS) # run pipeline up to consolidate stage
+        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS), # run pipeline up to LAA stage
+        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS) # run CCS and ccs_check
 
 
 rule source_data:
@@ -94,17 +93,17 @@ rule barcoding:
     params:
         bam2bam = config["SMRTCMD_PATH"] + "/bam2bam"
     shell:
-        "mkdir -p barcoded_subreads && "
         "{params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}"
+
 
 rule merge:
     """
-    Merge barcoded subreads from multiple movies into a single bam file
+    Merge barcoded subreads from multiple movies into a single dataset
     """
     input:
-        expand("barcoded_subreads/{movie}.subreadset.xml", movie=MOVIES)
+        expand("barcoded_subreads/{moviename}.subreadset.xml", moviename=MOVIES)
     output:
-        "barcoded_subreads/merged.subreadset.xml"
+        "merged_subreads/merged.subreadset.xml"
     params:
         dataset = config["SMRTCMD_PATH"] + "/dataset"
     shell:
@@ -113,16 +112,15 @@ rule merge:
 
 rule demultiplex:
     """
-    Create a single bam file for each barcode
+    Create a single dataset for each barcode
     """
     input:
-        "barcoded_subreads/merged.subreadset.xml"
+        "merged_subreads/merged.subreadset.xml"
     output:
         expand("demultiplexed/{bc_id}.xml", bc_id=BARCODE_IDS)
     params:
         dataset = config["SMRTCMD_PATH"] + "/dataset"
     run:
-        shell("mkdir -p demultiplexed")
         for i, bc in enumerate(BARCODE_IDS):
             outfile = output[i]
             shell("{params.dataset} filter {input} {outfile} 'bc=[{i},{i}]'")
@@ -133,13 +131,14 @@ rule consolidate:
     Create bam file from dataset xml
     """
     input:
-        "{stage}/{barcode}.xml"
+        "demultiplexed/{barcode}.xml"
     output:
-        "{stage}/{barcode}.bam"
+        bam = "consolidated/{barcode}.bam",
+        xml = "consolidated/{barcode}.xml"
     params:
         dataset = config["SMRTCMD_PATH"] + "/dataset"
     shell:
-        "{params.dataset} consolidate {input} {output} {input}"
+        "{params.dataset} consolidate {input} {output.bam} {output.xml}"
 
 
 rule laa:
@@ -147,7 +146,7 @@ rule laa:
     Run LAA
     """
     input:
-        bam = "demultiplexed/{barcode}.bam",
+        bam = "consolidated/{barcode}.bam",
         barcodes = config["BARCODES"]
     output:
         results = "LAA/{barcode}.fastq",
@@ -160,8 +159,6 @@ rule laa:
         subread_prefix = "LAA/subreads",
         laa_params = tool_param_string(config["LAA_PARAMS"])
     shell:
-        "echo {params.laa_params} && "
-        "mkdir -p LAA && "
         "{params.laa} {params.laa_params} "
         "--barcodes {input.barcodes} "
         "--resultFile {output.results} "
@@ -177,7 +174,7 @@ rule ccs:
     Run CCS
     """
     input:
-        "demultiplexed/{barcode}.bam"
+        "consolidated/{barcode}.bam"
     output:
         bam = "CCS/{barcode}.bam",
         report = "CCS/{barcode}.report.csv"
@@ -185,8 +182,6 @@ rule ccs:
         ccs = config["SMRTCMD_PATH"] + "/ccs",
         ccs_params = tool_param_string(config["CCS_PARAMS"])
     shell:
-        "echo {params.ccs_params} && "
-        "mkdir -p CCS && "
         "{params.ccs} {params.ccs_params} --reportFile {output.report} "
         "{input} {output.bam}"
 
@@ -196,8 +191,8 @@ rule ccs_check:
     Run ccs_check to analyze the ccs results
     """
     input:
-        bam = os.path.abspath("CCS/{barcode}.bam"),
-        genome = os.path.abspath(config["GENOME"])
+        bam = "CCS/{barcode}.bam",
+        genome = config["GENOME"]
     output:
         "ccs_check/{barcode}/qv_calibration.csv",
         "ccs_check/{barcode}/snrs.csv",
@@ -206,8 +201,10 @@ rule ccs_check:
         "ccs_check/{barcode}/zscores.csv"
     params:
         ccs_check_dir = config["CCS_CHECK_PATH"],
-        ccs_check = config["CCS_CHECK_PATH"] + "/ccscheck"
+        ccs_check = config["CCS_CHECK_PATH"] + "/ccscheck",
+        bam_path = os.path.abspath("CCS/{barcode}.bam"),
+        genome_path = os.path.abspath(config["GENOME"])
     shell:
         "mkdir -p ccs_check && cd ccs_check && rm -rf {wildcards.barcode} && "
         "export LD_LIBRARY_PATH={params.ccs_check_dir}:$LD_LIBRARY_PATH && "
-        "{params.ccs_check} {input.bam} {wildcards.barcode} {input.genome}"
+        "{params.ccs_check} {params.bam_path} {wildcards.barcode} {params.genome_path}"
