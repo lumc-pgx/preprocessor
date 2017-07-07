@@ -48,10 +48,15 @@ onerror:
 
 
 # main workflow
+localrules:
+    all, fastq_to_fasta
+
 rule all:
     input:
-        expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),             # run pipeline up to LAA stage
-        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS) # run CCS and ccs_check
+        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),             # run pipeline up to LAA stage
+        #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS) # run CCS and ccs_check
+        #expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS)
+        "summary/laa_summary.csv"
 
 
 rule source_data:
@@ -174,6 +179,19 @@ rule laa:
                 shell("touch {output_file}")
         
 
+rule laa_summary:
+    """
+    Summarize LAA results
+    """
+    input:
+        expand("LAA/{barcodes}_summary.csv", barcodes=BARCODE_IDS)
+    output:
+        "summary/laa_summary.csv"
+    shell:
+        "head -n1 {input[0]} > {output} && "
+        "cat {input} | grep -v 'BarcodeName,FastaName' >> {output}"
+
+
 rule ccs:
     """
     Run CCS
@@ -213,3 +231,16 @@ rule ccs_check:
         "mkdir -p ccs_check && cd ccs_check && rm -rf {wildcards.barcode} && "
         "export LD_LIBRARY_PATH={params.ccs_check_dir}:$LD_LIBRARY_PATH && "
         "{params.ccs_check} {params.bam_path} {wildcards.barcode} {params.genome_path}"
+
+
+rule fastq_to_fasta:
+    """
+    Convert fastq to fasta
+    """
+    input:
+        "{source}.fastq"
+    output:
+        "{source}.fasta"
+    run:
+        with open(input[0], "r") as fastq, open(output[0], "w") as fasta:
+            SeqIO.write((rec for rec in SeqIO.parse(fastq, "fastq")), fasta, "fasta")
