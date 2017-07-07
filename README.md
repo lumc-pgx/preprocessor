@@ -25,6 +25,10 @@ The preprocessor module performs the following operations:
 - Create a conda environment for running the pipeline
   - `conda env create -n preprocessor -f environment.yaml`
 
+- In order to use the pipeline on the cluster, update your .profile to use the drmaa library:
+  - `echo "export DRMAA_LIBRARY_PATH=libdrmaa.so.1.0" >> ~/.profile`
+  - `source ~/.profile`
+
 ## Configuration
 Pipeline configuration settings can be altered by editing [config.yaml](config.yaml).  
 
