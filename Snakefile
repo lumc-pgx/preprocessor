@@ -53,9 +53,8 @@ localrules:
 
 rule all:
     input:
-        #expand("LAA/{barcodes}.fastq", barcodes=BARCODE_IDS),             # run pipeline up to LAA stage
-        #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS) # run CCS and ccs_check
-        #expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS)
+        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
+        expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
         "summary/laa_summary.csv"
 
 
@@ -93,12 +92,24 @@ rule barcoding:
     output:
         "barcoded_subreads/{moviename}.subreads.bam",
         "barcoded_subreads/{moviename}.scraps.bam",
-        "barcoded_subreads/{moviename}.subreadset.xml"
+        "barcoded_subreads/{moviename}.subreadset.xml",
+        "barcoded_subreads/{moviename}.report.json.gz"
     params:
         bam2bam = config["SMRTCMD_PATH"] + "/bam2bam"
     shell:
         "{params.bam2bam} --barcodes {input.barcodes} -o barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}"
 
+
+rule barcoding_summary:
+    """
+    Put the barcode summary report into the summary folder
+    """
+    input:
+        "barcoded_subreads/{moviename}.report.json.gz"
+    output:
+        "summary/barcoding/{moviename}.report.json.gz"
+    shell:
+        "mkdir -p summary/barcoding && cp {input} {output}"
 
 rule merge:
     """
