@@ -55,7 +55,7 @@ rule all:
     input:
         expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
         expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
-        "summary/laa_summary.csv"
+        "summary/LAA/laa_summary.csv"
 
 
 rule source_data:
@@ -197,9 +197,9 @@ rule laa_summary:
     input:
         expand("LAA/{barcodes}_summary.csv", barcodes=BARCODE_IDS)
     output:
-        "summary/laa_summary.csv"
+        "summary/LAA/laa_summary.csv"
     shell:
-        "head -n1 {input[0]} > {output} && "
+        "mkdir -p summary/LAA && head -n1 {input[0]} > {output} && "
         "cat {input} | grep -v 'BarcodeName,FastaName' >> {output}"
 
 
