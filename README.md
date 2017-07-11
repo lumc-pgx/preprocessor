@@ -1,6 +1,6 @@
 # Preprocessor
 
-*Initial data processing for PacBio amplicon data.*  
+**Initial data processing for PacBio amplicon data.**  
 
 The preprocessor module performs the following operations:  
 - Combine raw data from multiple SMRT cells associated with a single experiment.
@@ -37,4 +37,6 @@ Pipeline configuration settings can be altered by editing [config.yaml](config.y
   - `source activate preprocessor`
 - For parallel execution on the cluster
   - `./run_cluster.sh`
+- To specify that the pipeline should write output to a location other than the default:
+  - `./run_cluster.sh -d path/to/output/directory`
 
