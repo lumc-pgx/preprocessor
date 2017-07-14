@@ -5,6 +5,7 @@ configfile: srcdir("config.yaml")
 import os
 import glob
 from Bio import SeqIO
+import datetime
 
 # globals
 PLATFORM = config["SEQUENCING_PLATFORM"].upper()
@@ -55,7 +56,8 @@ rule all:
     input:
         expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
         expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
-        "summary/LAA/laa_summary.csv"
+        "summary/LAA/laa_summary.csv",
+        "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
 
 
 rule source_data:
@@ -255,3 +257,11 @@ rule fastq_to_fasta:
     run:
         with open(input[0], "r") as fastq, open(output[0], "w") as fasta:
             SeqIO.write((rec for rec in SeqIO.parse(fastq, "fastq")), fasta, "fasta")
+
+
+rule write_config:
+    output:
+        "config.{timestamp}.yaml"
+    run:
+        with open(output[0], "w") as outfile:
+            yaml.dump(config, outfile, default_flow_style=False)
