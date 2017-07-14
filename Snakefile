@@ -5,6 +5,7 @@ configfile: srcdir("config.yaml")
 import os
 import glob
 from Bio import SeqIO
+import yaml
 import datetime
 
 # globals
