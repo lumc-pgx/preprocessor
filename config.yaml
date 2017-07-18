@@ -6,16 +6,15 @@ SEQUENCING_PLATFORM: RS2
 
 # Path to the folders which contain the sequencing output for each cell
 SOURCE_DATA_PATHS:
-  - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A02_1/Analysis_Results
-  - /exports/lgtc/equipment/PacBio/rundata/RV-230617_243/A01_1/Analysis_Results
+  - /exports/lgtc/equipment/PacBio/rundata/RV-280515_185/A07_1/Analysis_Results
 
 # Path to barcode fasta file used for demultiplexing
-BARCODES: /usr/local/smrtanalysis/current/common/references/pacbio_barcodes_96/sequence/pacbio_barcodes_96.fasta
+BARCODES: /exports/lgtc/projects/NGS_Data_to_transfer_to_users_by_LGTC/PacBio_barcodes/barcodes_pacbio_pad_index_1-2-3.fasta
 
 # Path to the genome fasta file to be used for mapping/alignment
 # The location of this file should be writable so that indexes can be created
 # TODO - put this somewhere accessible by other users
-GENOME: /home/wgallard/MyData/smrtpipe_test/GRCh38/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
+GENOME: /bam-export/Guy/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
 
 # Path to the folder containing the smrt command executables
 SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
@@ -26,15 +25,15 @@ CCS_CHECK_PATH: /home/wgallard/MyData/pacbio_tools/ccscheck
 
 # LAA parameters
 LAA_PARAMS:
-  - trimEnds: 21
-  - ignoreEnds: 21
+  - trimEnds: 0
+  - ignoreEnds: 30
   - fullLength
-  - minLength: 6000
+  - minLength: 2500
 
 # CCS parameters
 CCS_PARAMS:
-  - minLength: 6000
-  - maxLength: 7000
+  - minLength: 2500
+  - maxLength: 10000
   - minPasses: 1
   - minPredictedAccuracy: 0.75
  
