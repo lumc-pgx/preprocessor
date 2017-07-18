@@ -22,14 +22,19 @@ BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
 
 
 # utility functions
-def parse_param(config_entry):
+def parse_param(config_pair):
     """
     Parse a config entry from the config file
     """
-    try:
-        return list(config_entry.items())[0]
-    except AttributeError:
-        return [config_entry]
+    
+    # convert boolean to flag
+    if config_pair[1] is True:
+        return [config_pair[0]]
+    
+    if config_pair[1] is False:
+        return []
+    
+    return config_pair
 
 
 def tool_param_string(config_dict):
@@ -38,12 +43,16 @@ def tool_param_string(config_dict):
     :param config_dict: portion of the config which contains the params
     :return: A string containing the formatted parameters
     """
-    return " ".join(["--"+" ".join([str(x) for x in parse_param(i)]) for i in config_dict])
+    return " ".join(["--"+" ".join([str(x) for x in parse_param([i, config_dict[i]])]) for i in config_dict])
 
 
 # handlers for workflow exit status
 onsuccess:
     print("Preprocessing workflow completed successfully")
+    config_file = "config.{}.json".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
+    with open(config_file, "w") as outfile:
+        print(json.dumps(config), file=outfile)
+
 onerror:
     print("Error encountered while executing workflow")
     shell("cat {log}")
@@ -55,11 +64,10 @@ localrules:
 
 rule all:
     input:
-        expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
-        expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
-        "summary/LAA/laa_summary.csv",
-        "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
-
+        #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
+        #expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
+        expand("summary/ccs_check/{barcodes}.html", barcodes=BARCODE_IDS),
+        "summary/LAA/laa_summary.csv"
 
 rule source_data:
     """
@@ -260,9 +268,24 @@ rule fastq_to_fasta:
             SeqIO.write((rec for rec in SeqIO.parse(fastq, "fastq")), fasta, "fasta")
 
 
-rule write_config:
+rule ccs_check_summary:
+    """
+    Create plots of variant frequencies for the LAA amplicons using the
+    variants identified by ccs_check.
+    """
+    input:
+        ccs_zmws = "ccs_check/{barcode}/zmws.csv",
+        ccs_variants = "ccs_check/{barcode}/variants.csv",
+        laa_subreads = "LAA/subreads.{barcode}--{barcode}.csv",
+        laa_summary = "LAA/{barcode}_summary.csv"
     output:
-        "config.{timestamp}.yaml"
-    run:
-        with open(output[0], "w") as outfile:
-            yaml.dump(config, outfile, default_flow_style=False)
+        "summary/ccs_check/{barcode}.html"
+    params:
+        chrom = config["CCS_CHECK_PARAMS"]["chromosome"],
+        min_qv = config["CCS_CHECK_PARAMS"]["minQV"],
+        min_freq = config["CCS_CHECK_PARAMS"]["minFreq"],
+        min_length = config["CCS_CHECK_PARAMS"]["minLength"],
+        show_indel = config["CCS_CHECK_PARAMS"]["showIndel"]
+    script:
+        "scripts/ccs_check_summary.py"
+

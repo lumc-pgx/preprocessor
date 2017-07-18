@@ -20,3 +20,7 @@ ccs_check:
   threads: 1
   vmem: 16G
 
+# Parameters for the ccs_check summary tool
+ccs_check_summary:
+  threads: 1
+  vmem: 8G
