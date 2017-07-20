@@ -13,7 +13,7 @@ BARCODES: /usr/local/smrtanalysis/current/common/references/pacbio_barcodes_96/s
 
 # Path to the genome fasta file to be used for mapping/alignment
 # The location of this file should be writable so that indexes can be created
-# TODO - put this somewhere global
+# TODO - find a better home for this
 GENOME: /bam-export/Guy/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
 
 # Path to the folder containing the smrt command executables
