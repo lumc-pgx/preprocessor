@@ -36,7 +36,7 @@ Pipeline configuration settings can be altered by editing [config.yaml](config.y
 - Activate the conda environment
   - `source activate preprocessor`
 - For parallel execution on the cluster
-  - `./run_cluster.sh`
+  - `pipe-runner`
 - To specify that the pipeline should write output to a location other than the default:
-  - `./run_cluster.sh -d path/to/output/directory`
+  - `pipe-runner --directory path/to/output/directory`
 
