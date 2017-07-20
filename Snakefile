@@ -25,6 +25,7 @@ BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
 TARGET_FILES = []
 if config.get("STAGES", {}).get("LAA", False):
     TARGET_FILES.append("summary/LAA/laa_summary.csv")
+    TARGET_FILES += expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS)
 
 if config.get("STAGES", {}).get("CCS", False):
     TARGET_FILES += expand("CCS/{barcodes}.bam", barcodes=BARCODE_IDS)
