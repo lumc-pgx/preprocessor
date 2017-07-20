@@ -8,3 +8,5 @@ dependencies:
   - pandas=0.20.2
   - pandasql=0.7.3
   - bokeh=0.12.6
+  - pip:
+    - "git+https://git.lumc.nl/PharmacogenomicsPipe/pipe_runner.git@master#egg=pipe_runner"
