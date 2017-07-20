@@ -9,7 +9,7 @@ import yaml
 import datetime
 
 # globals
-PLATFORM = config["SEQUENCING_PLATFORM"].upper()
+PLATFORM = config.get("SEQUENCING_PLATFORM", "RS2").upper()
 assert PLATFORM in ("RS2", "SEQUEL"), "Invalid sequencing platform specified"
 
 if PLATFORM == "RS2":
@@ -19,6 +19,18 @@ else:
 
 MOVIES = [os.path.basename(BASECALLS[i][0]).split(".")[0] for i in range(len(BASECALLS))]
 BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
+
+
+# determine the files to be generated depending on which stages are to be run
+TARGET_FILES = []
+if config.get("STAGES", {}).get("LAA", False):
+    TARGET_FILES.append("summary/LAA/laa_summary.csv")
+
+if config.get("STAGES", {}).get("CCS", False):
+    TARGET_FILES += expand("CCS/{barcodes}.bam", barcodes=BARCODE_IDS)
+
+if config.get("STAGES", {}).get("CCS_CHECK", False):
+    TARGET_FILES += expand("summary/ccs_check/{barcodes}.html", barcodes=BARCODE_IDS)
 
 
 # utility functions
@@ -62,12 +74,15 @@ onerror:
 localrules:
     all, fastq_to_fasta
 
+
 rule all:
     input:
+        TARGET_FILES
         #expand("ccs_check/{barcodes}/variants.csv", barcodes=BARCODE_IDS), # run CCS and ccs_check
         #expand("LAA/{barcodes}.fasta", barcodes=BARCODE_IDS),
-        expand("summary/ccs_check/{barcodes}.html", barcodes=BARCODE_IDS),
-        "summary/LAA/laa_summary.csv"
+        #expand("summary/ccs_check/{barcodes}.html", barcodes=BARCODE_IDS),
+        #"summary/LAA/laa_summary.csv"
+
 
 rule source_data:
     """
@@ -121,6 +136,7 @@ rule barcoding_summary:
         "summary/barcoding/{moviename}.report.json.gz"
     shell:
         "mkdir -p summary/barcoding && cp {input} {output}"
+
 
 rule merge:
     """
