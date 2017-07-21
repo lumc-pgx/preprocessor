@@ -17,7 +17,7 @@ The preprocessor module performs the following operations:
 
 ## Installation
 - Clone the repository
-  - `git clone https://wgallard@git.lumc.nl/PharmacogenomicsPipe/preprocessor.git`
+  - `git clone https://git.lumc.nl/PharmacogenomicsPipe/preprocessor.git`
 
 - Change to the preprocessor directory
   - `cd preprocessor`
