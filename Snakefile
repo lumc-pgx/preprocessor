@@ -8,6 +8,12 @@ from Bio import SeqIO
 import yaml
 import datetime
 
+# yaml representer for dumping config
+from yaml.representer import Representer
+import collections
+yaml.add_representer(collections.defaultdict, Representer.represent_dict)
+
+
 # globals
 PLATFORM = config.get("SEQUENCING_PLATFORM", "RS2").upper()
 assert PLATFORM in ("RS2", "SEQUEL"), "Invalid sequencing platform specified"
@@ -62,9 +68,9 @@ def tool_param_string(config_dict):
 # handlers for workflow exit status
 onsuccess:
     print("Preprocessing workflow completed successfully")
-    config_file = "config.{}.json".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
-    with open(config_file, "w") as outfile:
-        print(json.dumps(config), file=outfile)
+    config_file = "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
+        with open(config_file, "w") as outfile:
+            print(yaml.dump(config, default_flow_style=False), file=outfile)
 
 onerror:
     print("Error encountered while executing workflow")
