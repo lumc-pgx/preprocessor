@@ -70,8 +70,8 @@ def tool_param_string(config_dict):
 onsuccess:
     print("Preprocessing workflow completed successfully")
     config_file = "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
-        with open(config_file, "w") as outfile:
-            print(yaml.dump(config, default_flow_style=False), file=outfile)
+    with open(config_file, "w") as outfile:
+        print(yaml.dump(config, default_flow_style=False), file=outfile)
 
 onerror:
     print("Error encountered while executing workflow")
