@@ -4,7 +4,6 @@ configfile: srcdir("config.yaml")
 # imports
 import os
 import glob
-from Bio import SeqIO
 import yaml
 import datetime
 
