@@ -24,7 +24,8 @@ else:
     BASECALLS = [sorted(glob.glob(pth + "/*.bam")) for pth in config["SOURCE_DATA_PATHS"]]
 
 MOVIES = [os.path.basename(BASECALLS[i][0]).split(".")[0] for i in range(len(BASECALLS))]
-BARCODE_IDS = [x.id for x in SeqIO.parse(config["BARCODES"], "fasta")]
+with open(config["BARCODES"], "r") as bc_file:
+    BARCODE_IDS = [line.strip()[1:] for line in bc_file if line.startswith(">")]
 
 
 # determine the files to be generated depending on which stages are to be run
@@ -309,6 +310,8 @@ rule ccs_check_summary:
         min_freq = config["CCS_CHECK_PARAMS"]["minFreq"],
         min_length = config["CCS_CHECK_PARAMS"]["minLength"],
         show_indel = config["CCS_CHECK_PARAMS"]["showIndel"]
+    conda:
+        "envs/ccs_check_summary.yaml"
     script:
         "scripts/ccs_check_summary.py"
 

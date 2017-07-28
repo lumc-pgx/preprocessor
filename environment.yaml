@@ -4,9 +4,5 @@ dependencies:
   - python=3.5
   - drmaa=0.7
   - snakemake=3.13.3
-  - biopython=1.69
-  - pandas=0.20.2
-  - pandasql=0.7.3
-  - bokeh=0.12.6
   - pip:
     - "git+https://git.lumc.nl/PharmacogenomicsPipe/pipe_runner.git@master#egg=pipe_runner"
