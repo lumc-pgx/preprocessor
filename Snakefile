@@ -286,9 +286,10 @@ rule fastq_to_fasta:
         "{source}.fastq"
     output:
         "{source}.fasta"
-    run:
-        with open(input[0], "r") as fastq, open(output[0], "w") as fasta:
-            SeqIO.write((rec for rec in SeqIO.parse(fastq, "fastq")), fasta, "fasta")
+    conda:
+        "envs/fastq_to_fasta.yaml"
+    shell:
+        "fastools fq2fa {input} {output}"
 
 
 rule ccs_check_summary:
