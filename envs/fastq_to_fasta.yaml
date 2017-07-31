@@ -3,4 +3,4 @@ channels:
 dependencies:
   - python=2.7
   - pip:
-    - fastools=0.14.1
+    - fastools==0.14.1
