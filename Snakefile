@@ -4,7 +4,7 @@ include: "globals.snake"
 
 PARAMS = Preprocessing(config)
 
-onsuccess: PARAMS.onsuccess("Variant Calling", config)
+onsuccess: PARAMS.onsuccess("Preprocessing", config)
 onerror: PARAMS.onerror()
 
 
