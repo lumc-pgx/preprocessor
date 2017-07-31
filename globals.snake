@@ -58,7 +58,7 @@ class Preprocessing(object):
         :param config_dict: portion of the config which contains the params
         :return: A string containing the formatted parameters
         """
-        return " ".join(["--"+" ".join([str(x) for x in self.parse_param([i, config_dict[i]])]) for i in config_dict])
+        return " ".join(["--"+" ".join([str(x) for x in Preprocessing.parse_param([i, config_dict[i]])]) for i in config_dict])
 
 
     # handlers for workflow exit status
