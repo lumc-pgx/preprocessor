@@ -31,10 +31,10 @@ STAGE_PARAMS:
     minLength: 6000
  
   CCS:
-    minlength: 6000
-    maxlength: 7000
-    minpasses: 1
-    minpredictedaccuracy: 0.75
+    minLength: 6000
+    maxLength: 7000
+    minPasses: 1
+    minPredictedAccuracy: 0.75
 
   CCS_CHECK:
     minQV: 0             # exclude subreads with qv < minQV
