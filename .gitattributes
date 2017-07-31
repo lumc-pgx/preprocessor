@@ -1,1 +1,2 @@
 /Snakefile gitlab-language=python
+*.snake gitlab-language=python
