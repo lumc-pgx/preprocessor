@@ -25,14 +25,14 @@ class Preprocessing(object):
 
         # determine the files to be generated depending on which stages are to be run
         self.TARGET_FILES = []
-        if config.get("STAGES", {}).get("LAA", False):
+        if config.get("STAGE_PARAMS", {}).get("LAA", False):
             self.TARGET_FILES.append("summary/LAA/laa_summary.csv")
             self.TARGET_FILES += expand("LAA/{barcodes}.fasta", barcodes=self.BARCODE_IDS)
 
-        if config.get("STAGES", {}).get("CCS", False):
+        if config.get("STAGE_PARAMS", {}).get("CCS", False):
             self.TARGET_FILES += expand("CCS/{barcodes}.bam", barcodes=self.BARCODE_IDS)
 
-        if config.get("STAGES", {}).get("CCS_CHECK", False):
+        if config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False):
             self.TARGET_FILES += expand("summary/ccs_check/{barcodes}.html", barcodes=self.BARCODE_IDS)
 
     # utility functions

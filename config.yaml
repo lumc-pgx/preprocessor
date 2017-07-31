@@ -21,30 +21,25 @@ SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
 # Path to the ccs_check tool
 CCS_CHECK_PATH: /usr/local/ccscheck/bin
 
-# Stages to be run
-STAGES:
-  LAA: True
-  CCS: True
-  CCS_CHECK: True
+# params for individual stages
+# to disable a stage, remove its parameters
+STAGE_PARAMS:
+  LAA: 
+    trimEnds: 21
+    ignoreEnds: 21
+    fullLength: True
+    minLength: 6000
+ 
+  CCS:
+    minlength: 6000
+    maxlength: 7000
+    minpasses: 1
+    minpredictedaccuracy: 0.75
 
-# LAA parameters
-LAA_PARAMS:
-  trimEnds: 21
-  ignoreEnds: 21
-  fullLength: True
-  minLength: 6000
+  CCS_CHECK:
+    minQV: 0             # exclude subreads with qv < minQV
+    minFreq: 0.02        # exclude variants with a frequency < minFreq (reduce baseline complexity)
+    chromosome: chr22    # only include subreads which map to this chromosome
+    showIndel: False     # if true, both snps and indels will be included, otherwise only snps
+    minLength: 2000      # exclude reads shorter than minLength
 
-# CCS parameters
-CCS_PARAMS:
-  minLength: 6000
-  maxLength: 7000
-  minPasses: 1
-  minPredictedAccuracy: 0.75
-
-# Parameters for ccs check parsing
-CCS_CHECK_PARAMS:
-  minQV: 0             # exclude subreads with qv < minQV
-  minFreq: 0.02        # exclude variants with a frequency < minFreq (reduce baseline complexity)
-  chromosome: chr22    # only include subreads which map to this chromosome
-  showIndel: False     # if true, both snps and indels will be included, otherwise only snps
-  minLength: 2000      # exclude reads shorter than minLength

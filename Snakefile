@@ -133,7 +133,7 @@ rule laa:
     params:
         laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "LAA/subreads",
-        laa_params = PARAMS.tool_param_string(config["LAA_PARAMS"])
+        laa_params = PARAMS.tool_param_string(config["STAGE_PARAMS"]["LAA"])
     run:
         shell(
             "{params.laa} {params.laa_params} "
@@ -175,7 +175,7 @@ rule ccs:
         report = "CCS/{barcode}.report.csv"
     params:
         ccs = config["SMRTCMD_PATH"] + "/ccs",
-        ccs_params = PARAMS.tool_param_string(config["CCS_PARAMS"])
+        ccs_params = PARAMS.tool_param_string(config["STAGE_PARAMS"]["CCS"])
     shell:
         "{params.ccs} {params.ccs_params} --reportFile {output.report} "
         "{input} {output.bam}"
@@ -232,11 +232,11 @@ rule ccs_check_summary:
     output:
         "summary/ccs_check/{barcode}.html"
     params:
-        chrom = config["CCS_CHECK_PARAMS"]["chromosome"],
-        min_qv = config["CCS_CHECK_PARAMS"]["minQV"],
-        min_freq = config["CCS_CHECK_PARAMS"]["minFreq"],
-        min_length = config["CCS_CHECK_PARAMS"]["minLength"],
-        show_indel = config["CCS_CHECK_PARAMS"]["showIndel"]
+        chrom = config["STAGE_PARAMS"]["CCS_CHECK"]["chromosome"],
+        min_qv = config["STAGE_PARAMS"]["CCS_CHECK"]["minQV"],
+        min_freq = config["STAGE_PARAMS"]["CCS_CHECK"]["minFreq"],
+        min_length = config["STAGE_PARAMS"]["CCS_CHECK"]["minLength"],
+        show_indel = config["STAGE_PARAMS"]["CCS_CHECK"]["showIndel"]
     conda:
         "envs/ccs_check_summary.yaml"
     script:
