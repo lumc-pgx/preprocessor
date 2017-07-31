@@ -1,8 +1,11 @@
 import os
 
-WORKFLOW_NAME = "PREPROCESSING"
+include: "globals.snake"
 
-include: "globals.snakefile"
+PARAMS = Preprocessing(config)
+
+onsuccess: PARAMS.onsuccess("Variant Calling", config)
+onerror: PARAMS.onerror()
 
 
 # main workflow
@@ -12,7 +15,7 @@ localrules:
 
 rule all:
     input:
-        TARGET_FILES
+        PARAMS.TARGET_FILES
 
 
 rule source_data:
@@ -21,7 +24,7 @@ rule source_data:
     Convert RS2 format bax.h5 to sequel bam if required
     """
     input:
-        lambda wildcards: BASECALLS[MOVIES.index(wildcards.moviename)]
+        lambda wildcards: PARAMS.BASECALLS[PARAMS.MOVIES.index(wildcards.moviename)]
     output:
         "basecalls/{moviename}.subreads.bam",
         "basecalls/{moviename}.scraps.bam"
@@ -29,7 +32,7 @@ rule source_data:
         bax2bam = config["SMRTCMD_PATH"] + "/bax2bam"
     run:
         shell("mkdir -p basecalls")
-        if PLATFORM == "RS2":
+        if PARAMS.PLATFORM == "RS2":
             shell("cd basecalls && {params.bax2bam} -o {wildcards.moviename} {input}")
         else:
             subreads = next(f for f in input if f.endswith("subreads.bam"))
@@ -74,7 +77,7 @@ rule merge:
     Merge barcoded subreads from multiple movies into a single dataset
     """
     input:
-        expand("barcoded_subreads/{moviename}.subreadset.xml", moviename=MOVIES)
+        expand("barcoded_subreads/{moviename}.subreadset.xml", moviename=PARAMS.MOVIES)
     output:
         "merged_subreads/merged.subreadset.xml"
     params:
@@ -90,11 +93,11 @@ rule demultiplex:
     input:
         "merged_subreads/merged.subreadset.xml"
     output:
-        expand("demultiplexed/{bc_id}.xml", bc_id=BARCODE_IDS)
+        expand("demultiplexed/{bc_id}.xml", bc_id=PARAMS.BARCODE_IDS)
     params:
         dataset = config["SMRTCMD_PATH"] + "/dataset"
     run:
-        for i, bc in enumerate(BARCODE_IDS):
+        for i, bc in enumerate(PARAMS.BARCODE_IDS):
             outfile = output[i]
             shell("{params.dataset} filter {input} {outfile} 'bc=[{i},{i}]'")
 
@@ -130,7 +133,7 @@ rule laa:
     params:
         laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "LAA/subreads",
-        laa_params = tool_param_string(config["LAA_PARAMS"])
+        laa_params = PARAMS.tool_param_string(config["LAA_PARAMS"])
     run:
         shell(
             "{params.laa} {params.laa_params} "
@@ -153,7 +156,7 @@ rule laa_summary:
     Summarize LAA results
     """
     input:
-        expand("LAA/{barcodes}_summary.csv", barcodes=BARCODE_IDS)
+        expand("LAA/{barcodes}_summary.csv", barcodes=PARAMS.BARCODE_IDS)
     output:
         "summary/LAA/laa_summary.csv"
     shell:
@@ -172,7 +175,7 @@ rule ccs:
         report = "CCS/{barcode}.report.csv"
     params:
         ccs = config["SMRTCMD_PATH"] + "/ccs",
-        ccs_params = tool_param_string(config["CCS_PARAMS"])
+        ccs_params = PARAMS.tool_param_string(config["CCS_PARAMS"])
     shell:
         "{params.ccs} {params.ccs_params} --reportFile {output.report} "
         "{input} {output.bam}"

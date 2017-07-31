@@ -9,11 +9,10 @@ SOURCE_DATA_PATHS:
   - /exports/lgtc/equipment/PacBio/rundata/RV-100317_230/A01_1/Analysis_Results 
 
 # Path to barcode fasta file used for demultiplexing
-BARCODES: /exports/lgtc/equipment/PacBio/jobs/000/000206/pacbio-barcodes/barcodes_pacbio_pad_index_1_9_v2/sequence/barcodes_pacbio_pad_index_1_9_v2.fasta 
+BARCODES: /exports/lgtc/equipment/PacBio/jobs/000/000206/pacbio-barcodes/barcodes_pacbio_pad_index_1_9_v2/sequence/barcodes_pacbio_pad_index_1_9_v2.fasta  
 
 # Path to the genome fasta file to be used for mapping/alignment
 # The location of this file should be writable so that indexes can be created
-# TODO - find a better home for this
 GENOME: /bam-export/Guy/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
 
 # Path to the folder containing the smrt command executables
