@@ -9,7 +9,10 @@ import collections
 yaml.add_representer(collections.defaultdict, Representer.represent_dict)
 
 class Preprocessing(object):
-    def __init__(self, config):
+    def __init__(self, config, workflow_name):
+        self.config = config
+        self.workflow_name = workflow_name
+
         self.PLATFORM = config.get("SEQUENCING_PLATFORM", "RS2").upper()
         assert self.PLATFORM in ("RS2", "SEQUEL"), "Invalid sequencing platform specified"
 
@@ -62,15 +65,13 @@ class Preprocessing(object):
 
 
     # handlers for workflow exit status
-    @staticmethod
-    def onsuccess(workflow_name, config):
-        print("{} workflow completed successfully".format(workflow_name))
+    def onsuccess(self):
+        print("{} workflow completed successfully".format(self.workflow_name))
         config_file = "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
         with open(config_file, "w") as outfile:
-            print(yaml.dump(config, default_flow_style=False), file=outfile)
+            print(yaml.dump(self.config, default_flow_style=False), file=outfile)
 
-    @staticmethod
-    def onerror():
+    def onerror(self):
         print("Error encountered while executing workflow")
         shell("cat {log}")
 
