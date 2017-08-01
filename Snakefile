@@ -1,10 +1,10 @@
 import os
 
-include: "globals.snake"
+include: "helper.snake"
 
-PARAMS = Preprocessing(config)
+PARAMS = Preprocessing(config, "preprocessing")
 
-onsuccess: PARAMS.onsuccess("Preprocessing", config)
+onsuccess: PARAMS.onsuccess()
 onerror: PARAMS.onerror()
 
 
