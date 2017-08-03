@@ -37,6 +37,15 @@ class Preprocessing(object):
         if config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False):
             self.TARGET_FILES += expand("summary/ccs_check/{barcodes}.html", barcodes=self.BARCODE_IDS)
 
+
+    @property
+    def inputs(self):
+        return self.BASECALLS
+
+    @property
+    def outputs(self):
+        return self.TARGET_FILES
+
     # utility functions
     @staticmethod
     def parse_param(config_pair):
