@@ -22,8 +22,18 @@ class Preprocessing(object):
 
         self.MOVIES = [os.path.basename(self.BASECALLS[i][0]).split(".")[0] for i in range(len(self.BASECALLS))]
 
-        with open(config["BARCODES"], "r") as bc_file:
-            self.BARCODE_IDS = [line.strip()[1:] for line in bc_file if line.startswith(">")]
+        barcode_ids = yaml.load(config.get("BARCODE_IDS", "[]"))
+
+        try:
+            with open(config["BARCODES"], "r") as bc_file:
+                barcode_file_ids = [line.strip()[1:] for line in bc_file if line.startswith(">")]
+        except IOError:
+            barcode_file_ids = []
+
+        if len(barcode_ids) and len(barcode_file_ids):
+            assert all((x in barcode_file_ids for x in barcode_ids)), "barcode id not in barcode file"
+
+        self.BARCODE_IDS = barcode_ids if len(barcode_ids) else barcode_file_ids
 
         # determine the files to be generated depending on which stages are to be run
         self.TARGET_FILES = []
