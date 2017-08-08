@@ -1,0 +1,12 @@
+rule fastq_to_fasta:
+    """
+    Convert fastq to fasta
+    """
+    input:
+        "{source}.fastq"
+    output:
+        "{source}.fasta"
+    conda:
+        "../envs/fastq_to_fasta.yaml"
+    shell:
+        "fastools fq2fa {input} {output}"

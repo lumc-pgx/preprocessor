@@ -1,0 +1,13 @@
+rule consolidate:
+    """
+    Create bam file from dataset xml
+    """
+    input:
+        "preprocessor/demultiplexed/{barcode}.xml"
+    output:
+        bam = "preprocessor/consolidated/{barcode}.bam",
+        xml = "preprocessor/consolidated/{barcode}.xml"
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset"
+    shell:
+        "{params.dataset} consolidate {input} {output.bam} {output.xml}"

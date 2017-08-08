@@ -12,22 +12,12 @@ class Preprocessing(object):
         self.config = config
         self.workflow_name = workflow_name
 
-        self.PLATFORM = config.get("SEQUENCING_PLATFORM", "RS2").upper()
-        assert self.PLATFORM in ("RS2", "SEQUEL"), "Invalid sequencing platform specified"
-
-        if self.PLATFORM == "RS2":
-            self.BASECALLS = [sorted(glob.glob(pth + "/*.bax.h5")) for pth in config["SOURCE_DATA_PATHS"]]
-        else:
-            self.BASECALLS = [sorted(glob.glob(pth + "/*.bam")) for pth in config["SOURCE_DATA_PATHS"]]
-
-        self.MOVIES = [os.path.basename(self.BASECALLS[i][0]).split(".")[0] for i in range(len(self.BASECALLS))]
-
         barcode_ids = yaml.load(config.get("BARCODE_IDS", "[]"))
 
         try:
             with open(config["BARCODES"], "r") as bc_file:
                 barcode_file_ids = [line.strip()[1:] for line in bc_file if line.startswith(">")]
-        except IOError:
+        except (KeyError, IOError):
             barcode_file_ids = []
 
         if len(barcode_ids) and len(barcode_file_ids):
@@ -35,51 +25,26 @@ class Preprocessing(object):
 
         self.BARCODE_IDS = barcode_ids if len(barcode_ids) else barcode_file_ids
 
-        # determine the files to be generated depending on which stages are to be run
-        self.TARGET_FILES = []
-        if config.get("STAGE_PARAMS", {}).get("LAA", False):
-            self.TARGET_FILES.append("summary/LAA/laa_summary.csv")
-            self.TARGET_FILES += expand("LAA/{barcodes}.fasta", barcodes=self.BARCODE_IDS)
-
-        if config.get("STAGE_PARAMS", {}).get("CCS", False):
-            self.TARGET_FILES += expand("CCS/{barcodes}.bam", barcodes=self.BARCODE_IDS)
-
-        if config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False):
-            self.TARGET_FILES += expand("summary/ccs_check/{barcodes}.html", barcodes=self.BARCODE_IDS)
-
-
-    @property
-    def inputs(self):
-        return self.BASECALLS
-
+    
     @property
     def outputs(self):
-        return self.TARGET_FILES
+        # determine the files to be generated depending on which stages are to be run
+        do_LAA = config.get("STAGE_PARAMS", {}).get("LAA", False)
+        do_CCS = config.get("STAGE_PARAMS", {}).get("CCS", False)
+        do_CCS_check = config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
+        
+        targets = []
+        if do_LAA:
+            targets.append("preprocessor/summary/LAA/laa_summary.csv")
+            targets += expand("preprocessor/LAA/{barcodes}.fasta", barcodes=self.BARCODE_IDS)
 
-    # utility functions
-    @staticmethod
-    def parse_param(config_pair):
-        """
-        Parse a config entry from the config file
-        """
-    
-        # convert boolean to flag
-        if config_pair[1] is True:
-            return [config_pair[0]]
-    
-        if config_pair[1] is False:
-            return []
-    
-        return config_pair
+        if do_CCS:
+            targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.BARCODE_IDS)
 
-    @staticmethod
-    def tool_param_string(config_dict):
-        """
-        Convert config settings to a parameter string for feeding to command line tools
-        :param config_dict: portion of the config which contains the params
-        :return: A string containing the formatted parameters
-        """
-        return " ".join(["--"+" ".join([str(x) for x in Preprocessing.parse_param([i, config_dict[i]])]) for i in config_dict])
+        if do_CCS_check:
+            targets += expand("preprocessor/summary/ccs_check/{barcodes}.html", barcodes=self.BARCODE_IDS)
+
+        return targets
 
 
     # handlers for workflow exit status

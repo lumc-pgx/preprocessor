@@ -1,0 +1,16 @@
+def barcode_id(wildcards):
+    return PARAMS.BARCODE_IDS.index(wildcards.barcode)
+
+rule demultiplex:
+    """
+    Create a single dataset for each barcode
+    """
+    input:
+        "preprocessor/merged_subreads/merged.subreadset.xml"
+    output:
+        "preprocessor/demultiplexed/{barcode}.xml"
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset",
+        bc_id = barcode_id
+    shell:
+        "{params.dataset} filter {input} {output} 'bc=[{params.bc_id},{params.bc_id}]'"

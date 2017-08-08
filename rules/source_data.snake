@@ -1,0 +1,34 @@
+import glob
+import os
+
+def smrt_cell_files():
+    sources = config["SOURCE_DATA_PATHS"]
+    extension = "/*.bax.h5" if config["SEQUENCING_PLATFORM"] == "RS2" else "/*.bam"
+    smrt_cell_files = [sorted(glob.glob(pth + extension)) for pth in sources]
+    return smrt_cell_files
+    
+def get_basecalls(wildcards):
+    basecalls = next((f for f in smrt_cell_files() if os.path.basename(f[0]).startswith(wildcards.moviename)))
+    return basecalls
+
+
+rule source_data:
+    """
+    Populate basecalls folder with subreads bam file
+    Convert RS2 format bax.h5 to sequel bam if required
+    """
+    input:
+        get_basecalls
+    output:
+        "preprocessor/basecalls/{moviename}.subreads.bam",
+        "preprocessor/basecalls/{moviename}.scraps.bam"
+    params:
+        bax2bam = config["SMRTCMD_PATH"] + "/bax2bam"
+    run:
+        if config["SEQUENCING_PLATFORM"] == "RS2":
+            shell("cd preprocessor/basecalls && {params.bax2bam} -o {wildcards.moviename} {input}")
+        else:
+            subreads = next(f for f in input if f.endswith("subreads.bam"))
+            scraps = next(f for f in input if f.endswith("scraps.bam"))
+            shell("ln -s {subreads} {output[0]}")
+            shell("ln -s {scraps}   {output[1]}")

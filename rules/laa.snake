@@ -1,0 +1,53 @@
+def laa_param_string():
+    """
+    Convert config settings to a parameter string for feeding to laa command line
+    :return: A string containing the formatted parameters
+    """
+    config_params = config["STAGE_PARAMS"].get("LAA", {})
+    
+    def parse_param(pair):
+        """Parse a config entry from the config file"""
+        # convert boolean to flag
+        if pair[1] is True:
+            return [pair[0]]
+    
+        if pair[1] is False:
+            return []
+    
+        return pair
+        
+    return " ".join(["--"+" ".join([str(x) for x in parse_param([*i])]) for i in config_params.items()])
+
+
+rule laa:
+    """
+    Run LAA
+    """
+    input:
+        bam = "preprocessor/consolidated/{barcode}.bam",
+        barcodes = config["BARCODES"]
+    output:
+        results = "preprocessor/LAA/{barcode}.fastq",
+        noise = "preprocessor/LAA/{barcode}_chimeras_noise.fastq",
+        report = "preprocessor/LAA/{barcode}_summary.csv",
+        input_report = "preprocessor/LAA/{barcode}_input.csv",
+        subread_report = "preprocessor/LAA/subreads.{barcode}--{barcode}.csv"
+    params:
+        laa = config["SMRTCMD_PATH"] + "/laa",
+        subread_prefix = "preprocessor/LAA/subreads",
+        laa_params = laa_param_string()
+    run:
+        shell(
+            "{params.laa} {params.laa_params} "
+            "--barcodes {input.barcodes} "
+            "--resultFile {output.results} "
+            "--junkFile {output.noise} "
+            "--reportFile {output.report} "
+            "--inputReportFile {output.input_report} "
+            "--subreadsReportPrefix {params.subread_prefix} "
+            "{input.bam}")
+        # LAA does not create output files if no amplicons were constructed
+        # Create empty files here for those cases
+        for output_file in output:
+            if not os.path.isfile(output_file):
+                shell("touch {output_file}")

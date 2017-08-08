@@ -1,0 +1,22 @@
+rule ccs_check_summary:
+    """
+    Create plots of variant frequencies for the LAA amplicons using the
+    variants identified by ccs_check.
+    """
+    input:
+        ccs_zmws = "preprocessor/ccs_check/{barcode}/zmws.csv",
+        ccs_variants = "preprocessor/ccs_check/{barcode}/variants.csv",
+        laa_subreads = "preprocessor/LAA/subreads.{barcode}--{barcode}.csv",
+        laa_summary = "preprocessor/LAA/{barcode}_summary.csv"
+    output:
+        "preprocessor/summary/ccs_check/{barcode}.html"
+    params:
+        chrom = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("chromosome", ""),
+        min_qv = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minQV", ""),
+        min_freq = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minFreq", ""),
+        min_length = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minLength", ""),
+        show_indel = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("showIndel", "")
+    conda:
+        "../envs/ccs_check_summary.yaml"
+    script:
+        "../scripts/ccs_check_summary.py"

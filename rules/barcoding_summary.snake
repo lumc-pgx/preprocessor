@@ -1,0 +1,10 @@
+rule barcoding_summary:
+    """
+    Put the barcode summary report into the summary folder
+    """
+    input:
+        "preprocessor/barcoded_subreads/{moviename}.report.json.gz"
+    output:
+        "preprocessor/summary/barcoding/{moviename}.report.json.gz"
+    shell:
+        "cp {input} {output}"
