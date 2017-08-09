@@ -1,0 +1,17 @@
+rule barcoding:
+    """
+    Create barcoded bam file from subreads bam file
+    """
+    input:
+        subreads = "preprocessor/basecalls/{moviename}.subreads.bam",
+        scraps = "preprocessor/basecalls/{moviename}.scraps.bam",
+        barcodes = config["BARCODES"]
+    output:
+        "preprocessor/barcoded_subreads/{moviename}.subreads.bam",
+        "preprocessor/barcoded_subreads/{moviename}.scraps.bam",
+        "preprocessor/barcoded_subreads/{moviename}.subreadset.xml",
+        "preprocessor/barcoded_subreads/{moviename}.report.json.gz"
+    params:
+        bam2bam = config["SMRTCMD_PATH"] + "/bam2bam"
+    shell:
+        "{params.bam2bam} --barcodes {input.barcodes} -o preprocessor/barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}"

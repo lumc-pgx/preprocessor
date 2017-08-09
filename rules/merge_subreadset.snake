@@ -1,0 +1,20 @@
+import glob
+
+def get_source_movies():
+    sources = config["SOURCE_DATA_PATHS"]
+    extension = "/*.bax.h5" if config["SEQUENCING_PLATFORM"] == "RS2" else "/*.bam"
+    return list({os.path.basename(f).split(".")[0] for pth in sources for f in glob.glob(pth + extension)})
+
+
+rule merge:
+    """
+    Merge barcoded subreads from multiple movies into a single dataset
+    """
+    input:
+        expand("preprocessor/barcoded_subreads/{movies}.subreadset.xml", movies=get_source_movies())
+    output:
+        "preprocessor/merged_subreads/merged.subreadset.xml"
+    params:
+        dataset = config["SMRTCMD_PATH"] + "/dataset"
+    shell:
+        "{params.dataset} merge {output} {input}"

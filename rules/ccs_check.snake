@@ -1,0 +1,24 @@
+import os
+
+rule ccs_check:
+    """
+    Run ccs_check to analyze the ccs results
+    """
+    input:
+        bam = "preprocessor/CCS/{barcode}.bam",
+        genome = config["GENOME"]
+    output:
+        "preprocessor/ccs_check/{barcode}/qv_calibration.csv",
+        "preprocessor/ccs_check/{barcode}/snrs.csv",
+        "preprocessor/ccs_check/{barcode}/variants.csv",
+        "preprocessor/ccs_check/{barcode}/zmws.csv",
+        "preprocessor/ccs_check/{barcode}/zscores.csv"
+    params:
+        ccs_check_dir = config["CCS_CHECK_PATH"],
+        ccs_check = config["CCS_CHECK_PATH"] + "/ccscheck",
+        bam_path = os.path.abspath("preprocessor/CCS/{barcode}.bam"),
+        genome_path = os.path.abspath(config["GENOME"])
+    shell:
+        "rm -r preprocessor/ccs_check/{wildcards.barcode} && "
+        "export LD_LIBRARY_PATH={params.ccs_check_dir}:$LD_LIBRARY_PATH && "
+        "{params.ccs_check} {params.bam_path} preprocessor/ccs_check/{wildcards.barcode} {params.genome_path}"

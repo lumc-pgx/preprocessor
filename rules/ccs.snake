@@ -1,0 +1,36 @@
+def ccs_param_string():
+    """
+    Convert config settings to a parameter string for feeding to ccs command line
+    :return: A string containing the formatted parameters
+    """
+    config_params = config["STAGE_PARAMS"].get("CCS", {})
+    
+    def parse_param(pair):
+        """Parse a config entry from the config file"""
+        # convert boolean to flag
+        if pair[1] is True:
+            return [pair[0]]
+    
+        if pair[1] is False:
+            return []
+    
+        return pair
+        
+    return " ".join(["--"+" ".join([str(x) for x in parse_param([*i])]) for i in config_params.items()])
+
+
+rule ccs:
+    """
+    Run CCS
+    """
+    input:
+        "preprocessor/consolidated/{barcode}.bam"
+    output:
+        bam = "preprocessor/CCS/{barcode}.bam",
+        report = "preprocessor/CCS/{barcode}.report.csv"
+    params:
+        ccs = config["SMRTCMD_PATH"] + "/ccs",
+        ccs_params = ccs_param_string()
+    shell:
+        "{params.ccs} {params.ccs_params} --reportFile {output.report} "
+        "{input} {output.bam}"
