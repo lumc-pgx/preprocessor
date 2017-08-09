@@ -1,64 +1,22 @@
-import os
-import glob
-import yaml
-import datetime
+from pipe_helper import PipeHelper
 
-# yaml representer for dumping config
-from yaml.representer import Representer
-import collections
-
-class Preprocessing(object):
-    def __init__(self, config, workflow_name):
-        self.config = config
-        self.workflow_name = workflow_name
-
-        self.BARCODE_IDS = yaml.load(config.get("BARCODE_IDS", "[]"))
-
-        try:
-            with open(config["BARCODES"], "r") as bc_file:
-                self.BARCODES = [line.strip()[1:] for line in bc_file if line.startswith(">")]
-        except KeyError:
-            raise WorkflowError("Barcode file not specified")
-        except IOError:
-            raise WorkflowError("Could not load barcodes")
-
-        if len(self.BARCODE_IDS) and len(self.BARCODES):
-            assert all((x in self.BARCODES for x in self.BARCODE_IDS)), "barcode id not in barcode file"
-
-        if len(self.BARCODE_IDS) == 0:
-            self.BARCODE_IDS = self.BARCODES
-
-    
+class PreprocessingHelper(PipeHelper):
     @property
     def outputs(self):
         # determine the files to be generated depending on which stages are to be run
-        do_LAA = config.get("STAGE_PARAMS", {}).get("LAA", False)
-        do_CCS = config.get("STAGE_PARAMS", {}).get("CCS", False)
-        do_CCS_check = config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
+        do_LAA = self._config.get("STAGE_PARAMS", {}).get("LAA", False)
+        do_CCS = self._config.get("STAGE_PARAMS", {}).get("CCS", False)
+        do_CCS_check = self._config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
         
         targets = []
         if do_LAA:
             targets.append("preprocessor/summary/LAA/laa_summary.csv")
-            targets += expand("preprocessor/LAA/{barcodes}.fasta", barcodes=self.BARCODE_IDS)
+            targets += expand("preprocessor/LAA/{barcodes}.fasta", barcodes=self.barcode_ids)
 
         if do_CCS:
-            targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.BARCODE_IDS)
+            targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)
 
         if do_CCS_check:
-            targets += expand("preprocessor/summary/ccs_check/{barcodes}.html", barcodes=self.BARCODE_IDS)
+            targets += expand("preprocessor/summary/ccs_check/{barcodes}.html", barcodes=self.barcode_ids)
 
         return targets
-
-
-    # handlers for workflow exit status
-    def onsuccess(self):
-        print("{} workflow completed successfully".format(self.workflow_name))
-        yaml.add_representer(collections.OrderedDict, Representer.represent_dict)
-        config_file = "config.{}.yaml".format("{:%Y-%m-%d_%H:%M:%S}".format(datetime.datetime.now()))
-        with open(config_file, "w") as outfile:
-            print(yaml.dump(self.config, default_flow_style=False), file=outfile)
-
-    def onerror(self):
-        print("Error encountered while executing workflow")
-        shell("cat {log}")
-

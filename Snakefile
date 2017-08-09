@@ -1,6 +1,6 @@
 include: "helper.snake"
 
-PARAMS = Preprocessing(config, "preprocessing")
+PARAMS = PreprocessingHelper(config, "preprocessing")
 
 onsuccess: PARAMS.onsuccess()
 onerror: PARAMS.onerror()

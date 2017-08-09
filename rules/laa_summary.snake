@@ -3,7 +3,7 @@ rule laa_summary:
     Summarize LAA results
     """
     input:
-        expand("preprocessor/LAA/{barcodes}_summary.csv", barcodes=PARAMS.BARCODE_IDS)
+        expand("preprocessor/LAA/{barcodes}_summary.csv", barcodes=PARAMS.barcode_ids)
     output:
         "preprocessor/summary/LAA/laa_summary.csv"
     shell:
