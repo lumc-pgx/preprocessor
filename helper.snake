@@ -12,18 +12,21 @@ class Preprocessing(object):
         self.config = config
         self.workflow_name = workflow_name
 
-        barcode_ids = yaml.load(config.get("BARCODE_IDS", "[]"))
+        self.BARCODE_IDS = yaml.load(config.get("BARCODE_IDS", "[]"))
 
         try:
             with open(config["BARCODES"], "r") as bc_file:
-                barcode_file_ids = [line.strip()[1:] for line in bc_file if line.startswith(">")]
-        except (KeyError, IOError):
-            barcode_file_ids = []
+                self.BARCODES = [line.strip()[1:] for line in bc_file if line.startswith(">")]
+        except KeyError:
+            raise WorkflowError("Barcode file not specified")
+        except IOError:
+            raise WorkflowError("Could not load barcodes")
 
-        if len(barcode_ids) and len(barcode_file_ids):
-            assert all((x in barcode_file_ids for x in barcode_ids)), "barcode id not in barcode file"
+        if len(self.BARCODE_IDS) and len(self.BARCODES):
+            assert all((x in self.BARCODES for x in self.BARCODE_IDS)), "barcode id not in barcode file"
 
-        self.BARCODE_IDS = barcode_ids if len(barcode_ids) else barcode_file_ids
+        if len(self.BARCODE_IDS) == 0:
+            self.BARCODE_IDS = self.BARCODES
 
     
     @property

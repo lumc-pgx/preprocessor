@@ -12,10 +12,10 @@ rule ccs_check_summary:
         "preprocessor/summary/ccs_check/{barcode}.html"
     params:
         chrom = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("chromosome", ""),
-        min_qv = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minQV", ""),
-        min_freq = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minFreq", ""),
-        min_length = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minLength", ""),
-        show_indel = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("showIndel", "")
+        min_qv = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minQV", 0),
+        min_freq = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minFreq", 0),
+        min_length = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("minLength", 0),
+        show_indel = config["STAGE_PARAMS"].get("CCS_CHECK", {}).get("showIndel", False)
     conda:
         "../envs/ccs_check_summary.yaml"
     script:
