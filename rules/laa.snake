@@ -45,7 +45,7 @@ rule laa:
     threads: 
         get_threads()
     resources:
-        memory = int(ceil(12 / get_threads()))
+        memory = int(ceil(16 / get_threads()))
     run:
         shell(
             "{params.laa} {params.laa_params} "
