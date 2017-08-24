@@ -29,6 +29,7 @@ STAGE_PARAMS:
     ignoreEnds: 21
     fullLength: True
     minLength: 6000
+    numThreads: 4
  
   CCS:
     minLength: 6000

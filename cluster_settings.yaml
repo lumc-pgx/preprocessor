@@ -6,8 +6,8 @@ __default__:
 # Parameters specific to LAA
 # LAA is computationally intensive
 laa:
-  threads: 2
-  vmem: 12G
+  threads: "{threads}"
+  vmem: "{resources.memory}G"
 
 # parameters specific to CCS
 # CCS is less resource intensive than LAA
