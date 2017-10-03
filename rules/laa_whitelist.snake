@@ -1,0 +1,10 @@
+rule laa_whitelist:
+    """
+    Identify subreads for ZMWs which contribute to a single amplicon
+    """
+    input:
+        "preprocessor/LAA_1/subreads.{barcode}--{barcode}.csv"
+    output:
+        "preprocessor/whitelist/{barcode}.whitelist"
+    script:
+        "../scripts/whitelist.py"

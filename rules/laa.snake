@@ -25,7 +25,7 @@ def get_threads():
     return config.get("STAGE_PARAMS", {}).get("LAA", {}).get("numThreads", 1)
 
 
-rule laa:
+rule laa_1:
     """
     Run LAA
     """
@@ -33,14 +33,14 @@ rule laa:
         bam = "preprocessor/consolidated/{barcode}.bam",
         barcodes = config["BARCODES"]
     output:
-        results = "preprocessor/LAA/{barcode}.fastq",
-        noise = "preprocessor/LAA/{barcode}_chimeras_noise.fastq",
-        report = "preprocessor/LAA/{barcode}_summary.csv",
-        input_report = "preprocessor/LAA/{barcode}_input.csv",
-        subread_report = "preprocessor/LAA/subreads.{barcode}--{barcode}.csv"
+        results = "preprocessor/LAA_1/{barcode}.fastq",
+        noise = "preprocessor/LAA_1/{barcode}_chimeras_noise.fastq",
+        report = "preprocessor/LAA_1/{barcode}_summary.csv",
+        input_report = "preprocessor/LAA_1/{barcode}_input.csv",
+        subread_report = "preprocessor/LAA_1/subreads.{barcode}--{barcode}.csv"
     params:
         laa = config["SMRTCMD_PATH"] + "/laa",
-        subread_prefix = "preprocessor/LAA/subreads",
+        subread_prefix = "preprocessor/LAA_1/subreads",
         laa_params = laa_param_string()
     threads: 
         get_threads()
@@ -61,3 +61,75 @@ rule laa:
         for output_file in output:
             if not os.path.isfile(output_file):
                 shell("touch {output_file}")
+
+
+rule laa_2:
+    """
+    Run LAA using whitelist of subreads
+    """
+    input:
+        bam = "preprocessor/consolidated/{barcode}.bam",
+        barcodes = config["BARCODES"],
+        whitelist = "preprocessor/whitelist/{barcode}.whitelist"
+    output:
+        results = "preprocessor/LAA_2/{barcode}.fastq",
+        noise = "preprocessor/LAA_2/{barcode}_chimeras_noise.fastq",
+        report = "preprocessor/LAA_2/{barcode}_summary.csv",
+        input_report = "preprocessor/LAA_2/{barcode}_input.csv",
+        subread_report = "preprocessor/LAA_2/subreads.{barcode}--{barcode}.csv"
+    params:
+        laa = config["SMRTCMD_PATH"] + "/laa",
+        subread_prefix = "preprocessor/LAA_2/subreads",
+        laa_params = laa_param_string()
+    threads: 
+        get_threads()
+    resources:
+        memory = int(ceil(24 / get_threads()))
+    run:
+        shell(
+            "{params.laa} {params.laa_params} "
+            "--barcodes {input.barcodes} "
+            "--resultFile {output.results} "
+            "--junkFile {output.noise} "
+            "--reportFile {output.report} "
+            "--inputReportFile {output.input_report} "
+            "--subreadsReportPrefix {params.subread_prefix} "
+            "--whitelist {input.whitelist} "
+            "{input.bam}")
+        # LAA does not create output files if no amplicons were constructed
+        # Create empty files here for those cases
+        for output_file in output:
+            if not os.path.isfile(output_file):
+                shell("touch {output_file}")
+
+
+if config.get("POLISH_LAA", True):
+    laa_dir = "LAA_2"
+else:
+    laa_dir = "LAA_1"
+
+localrules: link_laa
+
+rule link_laa:
+    """
+    Create link to LAA data for downstream use
+    """
+    input:
+        results = "preprocessor/{}/{{barcode}}.fastq".format(laa_dir),
+        noise = "preprocessor/{}/{{barcode}}_chimeras_noise.fastq".format(laa_dir),
+        report = "preprocessor/{}/{{barcode}}_summary.csv".format(laa_dir),
+        input_report = "preprocessor/{}/{{barcode}}_input.csv".format(laa_dir),
+        subread_report = "preprocessor/{}/subreads.{{barcode}}--{{barcode}}.csv".format(laa_dir)
+    output:
+        results = "preprocessor/LAA/{barcode}.fastq",
+        noise = "preprocessor/LAA/{barcode}_chimeras_noise.fastq",
+        report = "preprocessor/LAA/{barcode}_summary.csv",
+        input_report = "preprocessor/LAA/{barcode}_input.csv",
+        subread_report = "preprocessor/LAA/subreads.{barcode}--{barcode}.csv"
+    shell:
+        "ln -sr {input.results} {output.results} &&"
+        "ln -sr {input.noise} {output.noise} &&"
+        "ln -sr {input.report} {output.report} &&"
+        "ln -sr {input.input_report} {output.input_report} &&"
+        "ln -sr {input.subread_report} {output.subread_report}"
+        

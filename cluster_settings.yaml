@@ -5,7 +5,11 @@ __default__:
 
 # Parameters specific to LAA
 # LAA is computationally intensive
-laa:
+laa_1:
+  threads: "{threads}"
+  vmem: "{resources.memory}G"
+
+laa_2:
   threads: "{threads}"
   vmem: "{resources.memory}G"
 
