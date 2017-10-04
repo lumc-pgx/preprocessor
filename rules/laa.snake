@@ -103,7 +103,7 @@ rule laa_2:
                 shell("touch {output_file}")
 
 
-if config.get("POLISH_LAA", True):
+if config.get("POLISH_LAA", False):
     laa_dir = "LAA_2"
 else:
     laa_dir = "LAA_1"
