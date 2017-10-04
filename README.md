@@ -15,34 +15,41 @@ digraph snakemake_dag {
     graph[bgcolor=white, margin=0];
     node[shape=box, style=rounded, fontname=sans,                 fontsize=10, penwidth=2];
     edge[penwidth=2, color=grey];
-	0[label = "consolidate", color = "0.00 0.6 0.85", style="rounded"];
-	1[label = "fastq_to_fasta", color = "0.31 0.6 0.85", style="rounded"];
-	2[label = "ccs_check_summary", color = "0.05 0.6 0.85", style="rounded"];
-	3[label = "demultiplex", color = "0.10 0.6 0.85", style="rounded"];
-	4[label = "ccs_check", color = "0.26 0.6 0.85", style="rounded"];
-	5[label = "ccs", color = "0.21 0.6 0.85", style="rounded"];
-	6[label = "laa", color = "0.36 0.6 0.85", style="rounded"];
-	7[label = "all", color = "0.41 0.6 0.85", style="rounded"];
-	8[label = "laa_summary", color = "0.46 0.6 0.85", style="rounded"];
-	9[label = "source_data", color = "0.15 0.6 0.85", style="rounded"];
-	10[label = "barcoding", color = "0.51 0.6 0.85", style="rounded"];
-	11[label = "merge", color = "0.62 0.6 0.85", style="rounded"];
-	3 -> 0
-	6 -> 1
-	4 -> 2
-	6 -> 2
-	11 -> 3
-	5 -> 4
-	0 -> 5
-	0 -> 6
-	1 -> 7
-	8 -> 7
-	2 -> 7
-	5 -> 7
-	6 -> 8
-	9 -> 10
-	10 -> 11
-}
+        0[label = "barcoding", color = "0.00 0.6 0.85", style="rounded"];
+        1[label = "link_laa", color = "0.08 0.6 0.85", style="rounded"];
+        2[label = "ccs_check", color = "0.12 0.6 0.85", style="rounded"];
+        3[label = "all", color = "0.58 0.6 0.85", style="rounded"];
+        4[label = "source_data", color = "0.25 0.6 0.85", style="rounded"];
+        5[label = "laa_1", color = "0.54 0.6 0.85", style="rounded"];
+        6[label = "fastq_to_fasta", color = "0.38 0.6 0.85", style="rounded"];
+        7[label = "demultiplex", color = "0.33 0.6 0.85", style="rounded"];
+        8[label = "ccs", color = "0.42 0.6 0.85", style="rounded"];
+        9[label = "ccs_check_summary", color = "0.46 0.6 0.85", style="rounded"];
+        10[label = "laa_summary", color = "0.50 0.6 0.85", style="rounded"];
+        11[label = "laa_whitelist", color = "0.17 0.6 0.85", style="rounded"];
+        12[label = "merge", color = "0.29 0.6 0.85", style="rounded"];
+        13[label = "laa_2", color = "0.21 0.6 0.85", style="rounded"];
+        14[label = "consolidate", color = "0.62 0.6 0.85", style="rounded"];
+        4 -> 0
+        13 -> 1
+        8 -> 2
+        6 -> 3
+        8 -> 3
+        9 -> 3
+        10 -> 3
+        14 -> 5
+        1 -> 6
+        12 -> 7
+        14 -> 8
+        1 -> 9
+        2 -> 9
+        1 -> 10
+        5 -> 11
+        0 -> 12
+        14 -> 13
+        11 -> 13
+        7 -> 14
+}            
 ```
   
 ## Requirements
