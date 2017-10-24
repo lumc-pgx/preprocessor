@@ -20,5 +20,5 @@ rule ccs_check:
         genome_path = os.path.abspath(config["GENOME"])
     shell:
         "rm -r preprocessor/ccs_check/{wildcards.barcode} && "
-        "export LD_LIBRARY_PATH={params.ccs_check_dir}:$LD_LIBRARY_PATH && "
+        "export LD_LIBRARY_PATH={params.ccs_check_dir}:${LD_LIBRARY_PATH:-} && "
         "{params.ccs_check} {params.bam_path} preprocessor/ccs_check/{wildcards.barcode} {params.genome_path}"
