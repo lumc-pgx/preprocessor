@@ -129,8 +129,13 @@ def process(zmw_csv, variant_csv, laa_csv, laa_summary_csv):
     tools = plots.children[0].tools
     
     laa_data = dataframe_from_csv(laa_csv)
+     # LAA does not consitently write integers to the subreads file, so convert
+    for column in laa_data.columns[1:]:
+        laa_data[column] = laa_data[column].map(lambda x: int(x + 0.5))
+    # add column for Movei and ZMW
     laa_data["Movie"] = laa_data["SubreadId"].map(lambda x: x.split("/")[0])
     laa_data["ZMW"] = laa_data["SubreadId"].map(lambda x: int(x.split("/")[1]))
+   
     
     laa_summary = dataframe_from_csv(laa_summary_csv)
     laa_summary = laa_summary[(laa_summary["NoiseSequence"] == 0) & (laa_summary["IsDuplicate"] == 0) & (laa_summary["IsChimera"] == 0)]
