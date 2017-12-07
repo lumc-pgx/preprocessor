@@ -7,6 +7,9 @@ def laa_param_string():
     """
     config_params = config["STAGE_PARAMS"].get("LAA", {})
     
+    if not config_params.get("numThreads", False):
+        config_params["numThreads"] = 1
+    
     def parse_param(pair):
         """Parse a config entry from the config file"""
         # convert boolean to flag
