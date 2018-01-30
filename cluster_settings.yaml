@@ -28,3 +28,8 @@ ccs_check:
 ccs_check_summary:
   threads: 1
   vmem: 8G
+
+# Parameters for barcoding
+barcoding:
+  threads: "{threads}"
+  vmem: 2G

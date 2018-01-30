@@ -35,5 +35,5 @@ zmws = zmw_assignments(snakemake.input[0])
 # write the whitelist which contains only subreads for zmws which contribute to a single amplicon sequence
 with open(snakemake.output[0], "w") as outfile:
     for zmw, count in zmws.items():
-        if len(count) <= 1:
+        if len(count) == 1:
             print(zmw, file=outfile)
