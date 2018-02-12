@@ -78,10 +78,10 @@ def make_plot(source_data, title, link_axes=None):
         size=5, color="navy", alpha=0.75, line_width=1)
     
     p.cross(x="Pos", y="Freq", source=data[data["Type"] == "Insertion"],
-            size=7, color="navy", alpha=0.75, line_width=1)
+            size=7, color="orange", alpha=0.75, line_width=1)
     
     p.circle(x="Pos", y="Freq", source=data[data["Type"] == "Deletion"],
-             size=5, line_color="navy", line_alpha=0.75, line_width=1, fill_alpha=0)
+             size=5, line_color="orange", line_alpha=0.75, line_width=1, fill_alpha=0)
     
     hover = HoverTool(tooltips=[
         ("Pos", "@Pos"),
