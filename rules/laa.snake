@@ -44,11 +44,11 @@ rule laa_1:
     params:
         laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "preprocessor/LAA_1/subreads",
-        laa_params = laa_param_string() + " --maxPhasingReads 1000" if config.get("POLISH_LAA", False) else ""
+        laa_params = laa_param_string()
     threads: 
         get_threads()
     resources:
-        memory = int(ceil(48 / get_threads()))
+        memory = int(ceil(24 / get_threads()))
     run:
         shell(
             "{params.laa} {params.laa_params} "
