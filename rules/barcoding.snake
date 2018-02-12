@@ -1,17 +1,44 @@
+def lima_param_string():
+    """
+    Convert config settings to a parameter string for feeding to lima command line
+    :return: A string containing the formatted parameters
+    """
+    config_params = config["STAGE_PARAMS"].get("LIMA", {})
+    
+    if not config_params.get("num-threads", False):
+        config_params["num-threads"] = 1
+    
+    def parse_param(pair):
+        """Parse a config entry from the config file"""
+        # convert boolean to flag
+        if pair[1] is True:
+            return [pair[0]]
+    
+        if pair[1] is False:
+            return []
+    
+        return pair
+        
+    return " ".join(["--"+" ".join([str(x) for x in parse_param([*i])]) for i in config_params.items()])
+
+
 rule barcoding:
     """
-    Create barcoded bam file from subreads bam file
+    Create barcoded bam file from subreads bam file using lima
     """
     input:
         subreads = "preprocessor/basecalls/{moviename}.subreads.bam",
-        scraps = "preprocessor/basecalls/{moviename}.scraps.bam",
         barcodes = config["BARCODES"]
     output:
-        "preprocessor/barcoded_subreads/{moviename}.subreads.bam",
-        "preprocessor/barcoded_subreads/{moviename}.scraps.bam",
-        "preprocessor/barcoded_subreads/{moviename}.subreadset.xml",
-        "preprocessor/barcoded_subreads/{moviename}.report.json.gz"
+        bam = "preprocessor/barcoded_subreads/{moviename}.bam",
+        counts = "preprocessor/barcoded_subreads/{moviename}.lima.counts",
+        report = "preprocessor/barcoded_subreads/{moviename}.lima.report",
+        summary = "preprocessor/barcoded_subreads/{moviename}.lima.summary",
+        subreadset = "preprocessor/barcoded_subreads/{moviename}.subreadset.xml"
     params:
-        bam2bam = config["SMRTCMD_PATH"] + "/bam2bam"
+        lima = config["LIMA_PATH"],
+        lima_params = lima_param_string()
+    threads:
+        config.get("STAGE_PARAMS", {}).get("LIMA", {}).get("num-threads", 1)
     shell:
-        "{params.bam2bam} --barcodes {input.barcodes} -o preprocessor/barcoded_subreads/{wildcards.moviename} {input.subreads} {input.scraps}"
+        "{params.lima} {params.lima_params} {input.subreads} {input.barcodes} {output.bam}"

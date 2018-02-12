@@ -21,6 +21,9 @@ SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
 # Path to the ccs_check tool
 CCS_CHECK_PATH: /usr/local/ccscheck/bin
 
+# Path to the LIMA barcoding tool
+LIMA_PATH: /home/wgallard/bin/lima
+
 # polish laa
 POLISH_LAA: True
 
@@ -30,7 +33,7 @@ STAGE_PARAMS:
   LAA: 
     trimEnds: 21
     ignoreEnds: 21
-    fullLength: True
+    #fullLength: True
     minLength: 6000
     numThreads: 4
  
@@ -46,4 +49,10 @@ STAGE_PARAMS:
     chromosome: chr22    # only include subreads which map to this chromosome
     showIndel: False     # if true, both snps and indels will be included, otherwise only snps
     minLength: 2000      # exclude reads shorter than minLength
+  
+  LIMA:
+    same: True           # symmetric barcoding
+    num-threads: 4       # number of threads
+    dump-clips: True     # save the clipped adapters
+    
 
