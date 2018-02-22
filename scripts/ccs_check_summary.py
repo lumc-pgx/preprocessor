@@ -124,7 +124,10 @@ def process(zmw_csv, variant_csv, laa_csv, laa_summary_csv):
     zmw_data = dataframe_from_csv(zmw_csv)
     var_data = dataframe_from_csv(variant_csv)
     
+    results = {}
     counts = parse_data(zmw_data, var_data)
+    results["data"] = counts
+    
     plots = Column(make_plot(counts, "Consensus All"))
     tools = plots.children[0].tools
     
@@ -174,19 +177,26 @@ def process(zmw_csv, variant_csv, laa_csv, laa_summary_csv):
         tools=tools,
     )
     
-    return Row(plots, toolbar)
+    results["plots"] = Row(plots, toolbar)
+    
+    return results
 
 
-output_file(snakemake.output[0], title=snakemake.wildcards.barcode)
+output_file(snakemake.output.plots, title=snakemake.wildcards.barcode)
 
 try:
-    plots = process(
+    results = process(
         zmw_csv = snakemake.input.ccs_zmws,
         variant_csv = snakemake.input.ccs_variants,
         laa_csv = snakemake.input.laa_subreads,
         laa_summary_csv = snakemake.input.laa_summary
     )
     
-    save(plots)
+    # write the html
+    save(results["plots"])
+    
+    # write the tabular data
+    results["data"].to_csv(snakemake.output.table, index=False)
 except pd.errors.EmptyDataError:
     save(Div(text="No Data"))
+    pd.DataFrame().to_csv(snakemake.output.table, index=False)

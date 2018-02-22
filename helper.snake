@@ -17,6 +17,6 @@ class PreprocessingHelper(PipeHelper):
             targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)
 
         if do_CCS_check:
-            targets += expand("preprocessor/summary/ccs_check/{barcodes}.html", barcodes=self.barcode_ids)
+            targets += expand("preprocessor/summary/ccs_check/{barcodes}.{ext}", barcodes=self.barcode_ids, ext=("html", "csv"))
 
         return targets
