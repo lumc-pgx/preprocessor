@@ -10,7 +10,8 @@ rule demultiplex:
     output:
         "preprocessor/demultiplexed/{barcode}.xml"
     params:
-        dataset = config["SMRTCMD_PATH"] + "/dataset",
         bc_id = barcode_id
+    conda:
+        "../envs/pbtools.yaml"
     shell:
-        "{params.dataset} filter {input} {output} 'bc=[{params.bc_id},{params.bc_id}]'"
+        "dataset filter {input} {output} 'bc=[{params.bc_id},{params.bc_id}]'"

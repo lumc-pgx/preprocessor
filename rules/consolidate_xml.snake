@@ -7,7 +7,7 @@ rule consolidate:
     output:
         bam = "preprocessor/consolidated/{barcode}.bam",
         xml = "preprocessor/consolidated/{barcode}.xml"
-    params:
-        dataset = config["SMRTCMD_PATH"] + "/dataset"
+    conda:
+        "../envs/pbtools.yaml"
     shell:
-        "{params.dataset} consolidate {input} {output.bam} {output.xml}"
+        "dataset consolidate {input} {output.bam} {output.xml}"

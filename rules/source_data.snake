@@ -22,11 +22,11 @@ rule source_data:
     output:
         "preprocessor/basecalls/{moviename}.subreads.bam",
         "preprocessor/basecalls/{moviename}.scraps.bam"
-    params:
-        bax2bam = config["SMRTCMD_PATH"] + "/bax2bam"
+    conda:
+        "../envs/pbtools.yaml"
     run:
         if config["SEQUENCING_PLATFORM"] == "RS2":
-            shell("cd preprocessor/basecalls && {params.bax2bam} -o {wildcards.moviename} {input}")
+            shell("cd preprocessor/basecalls && bax2bam -o {wildcards.moviename} {input}")
         else:
             subreads = next(f for f in input if f.endswith("subreads.bam"))
             scraps = next(f for f in input if f.endswith("scraps.bam"))

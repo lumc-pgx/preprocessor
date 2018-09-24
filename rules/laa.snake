@@ -42,16 +42,17 @@ rule laa_1:
         input_report = "preprocessor/LAA_1/{barcode}_input.csv",
         subread_report = "preprocessor/LAA_1/subreads.{barcode}--{barcode}.csv"
     params:
-        laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "preprocessor/LAA_1/subreads",
         laa_params = laa_param_string()
     threads: 
         get_threads()
     resources:
         memory = int(ceil(24 / get_threads()))
+    conda:
+        "../envs/pbtools.yaml"
     run:
         shell(
-            "{params.laa} {params.laa_params} "
+            "laa {params.laa_params} "
             "--barcodes {input.barcodes} "
             "--resultFile {output.results} "
             "--junkFile {output.noise} "
@@ -81,16 +82,17 @@ rule laa_2:
         input_report = "preprocessor/LAA_2/{barcode}_input.csv",
         subread_report = "preprocessor/LAA_2/subreads.{barcode}--{barcode}.csv"
     params:
-        laa = config["SMRTCMD_PATH"] + "/laa",
         subread_prefix = "preprocessor/LAA_2/subreads",
         laa_params = laa_param_string()
     threads: 
         get_threads()
     resources:
         memory = int(ceil(24 / get_threads()))
+    conda:
+        "../envs/pbtools.yaml"
     run:
         shell(
-            "{params.laa} {params.laa_params} "
+            "laa {params.laa_params} "
             "--barcodes {input.barcodes} "
             "--resultFile {output.results} "
             "--junkFile {output.noise} "

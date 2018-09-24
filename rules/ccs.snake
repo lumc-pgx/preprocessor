@@ -29,8 +29,9 @@ rule ccs:
         bam = "preprocessor/CCS/{barcode}.bam",
         report = "preprocessor/CCS/{barcode}.report.csv"
     params:
-        ccs = config["SMRTCMD_PATH"] + "/ccs",
         ccs_params = ccs_param_string()
+    conda:
+        "../envs/pbtools.yaml"
     shell:
-        "{params.ccs} {params.ccs_params} --reportFile {output.report} "
+        "ccs {params.ccs_params} --reportFile {output.report} "
         "{input} {output.bam}"

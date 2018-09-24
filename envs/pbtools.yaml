@@ -1,0 +1,9 @@
+channels:
+  - bioconda
+dependencies:
+  - python=2.7
+  - pbcoretools=0.2.4
+  - bax2bam=0.0.9
+  - pblaa=2.4.2
+  - pbccs=3.1.0
+  - lima=1.8.0

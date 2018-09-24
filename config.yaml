@@ -15,9 +15,6 @@ BARCODES: /exports/lgtc/equipment/PacBio/jobs/000/000206/pacbio-barcodes/barcode
 # The location of this file should be writable so that indexes can be created
 GENOME: /bam-export/Guy/GRCh38_no_alt_analysis_set/sequence/GRCh38_no_alt_analysis_set.fasta
 
-# Path to the folder containing the smrt command executables
-SMRTCMD_PATH: /usr/local/smrtlink/smrtcmds/bin
-
 # Path to the ccs_check tool
 CCS_CHECK_PATH: /usr/local/ccscheck/bin
 

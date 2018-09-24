@@ -15,7 +15,7 @@ rule merge:
         expand("preprocessor/barcoded_subreads/{movies}.subreadset.xml", movies=get_source_movies())
     output:
         "preprocessor/merged_subreads/merged.subreadset.xml"
-    params:
-        dataset = config["SMRTCMD_PATH"] + "/dataset"
+    conda:
+        "../envs/pbtools.yaml"
     shell:
-        "{params.dataset} merge {output} {input}"
+        "dataset merge {output} {input}"

@@ -54,7 +54,6 @@ digraph snakemake_dag {
   
 ## Requirements
 - [Conda/Miniconda](https://conda.io/miniconda.html)  
-- [PacBio SmrtLink](https://github.com/PacificBiosciences/SMRT-Link)
 - [ccscheck](https://github.com/PacificBiosciences/ccscheck)
 
 ## Installation

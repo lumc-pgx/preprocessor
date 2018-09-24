@@ -36,9 +36,10 @@ rule barcoding:
         summary = "preprocessor/barcoded_subreads/{moviename}.lima.summary",
         subreadset = "preprocessor/barcoded_subreads/{moviename}.subreadset.xml"
     params:
-        lima = config["LIMA_PATH"],
         lima_params = lima_param_string()
     threads:
         config.get("STAGE_PARAMS", {}).get("LIMA", {}).get("num-threads", 1)
+    conda:
+        "../envs/pbtools.yaml"
     shell:
-        "{params.lima} {params.lima_params} {input.subreads} {input.barcodes} {output.bam}"
+        "lima {params.lima_params} {input.subreads} {input.barcodes} {output.bam}"
