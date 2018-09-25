@@ -1,4 +1,4 @@
-config = Snakemake.config
+config = snakemake.config
 
 if config["SEQUENCING_PLATFORM"] == "RS2":
     shell("cd preprocessor/basecalls && bax2bam -o {wildcards.moviename} {input}")
