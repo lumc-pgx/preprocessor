@@ -7,3 +7,4 @@ dependencies:
   - pblaa=2.4.2
   - pbccs=3.1.0
   - lima=1.8.0
+  - pbbam=0.0.8
