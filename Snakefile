@@ -7,7 +7,7 @@ onerror: PARAMS.onerror()
 
 # main workflow
 localrules:
-    all, fastq_to_fasta, barcoding_summary
+    all, fastq_to_fasta
 
 rule all:
     input:
