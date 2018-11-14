@@ -4,14 +4,13 @@ class PreprocessingHelper(PipeHelper):
     @property
     def outputs(self):
         # determine the files to be generated depending on which stages are to be run
-        do_LAA = self._config.get("STAGE_PARAMS", {}).get("LAA", False)
+        do_Amplicon = self._config.get("STAGE_PARAMS", {}).get("CCS_AMPLICON", False)
         do_CCS = self._config.get("STAGE_PARAMS", {}).get("CCS", False)
         do_CCS_check = self._config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
         
         targets = []
-        if do_LAA:
-            targets.append("preprocessor/summary/LAA/laa_summary.csv")
-            targets += expand("preprocessor/LAA/{barcodes}.fasta", barcodes=self.barcode_ids)
+        if do_Amplicon:
+            targets += expand("preprocessor/CCS_Amplicon/{barcodes}/haplotypes/{barcodes}.fastq", barcodes=self.barcode_ids)
 
         if do_CCS:
             targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)

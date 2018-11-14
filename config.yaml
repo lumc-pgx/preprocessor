@@ -24,13 +24,21 @@ POLISH_LAA: True
 # params for individual stages
 # to disable a stage, remove its parameters
 STAGE_PARAMS:
-  LAA: 
-    trimEnds: 21
-    ignoreEnds: 21
-    #fullLength: True
-    minLength: 6000
-    numThreads: 4
- 
+  CCS_AMPLICON:
+    min-ccs-length: 6000
+    max-ccs-length: 7000
+    min-ccs-passes: 1
+    min-ccs-qual: 0.98
+    max-homopolymer: 2
+    tsne-iterations: 5000
+    tsne-rate: 50
+    cluster-percentile: 80
+    cluster-inflation: 1.4
+    max-cluster-passes: 500
+    consensus-fraction: 0.51
+    min-haplotype-molecules: 10
+    min-variant-qual: 50
+
   CCS:
     minLength: 6000
     maxLength: 7000
