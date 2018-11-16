@@ -1,3 +1,5 @@
+import os
+
 def ccs_amplicon_param_string():
     """
     Convert config settings to a parameter string for feeding
@@ -7,20 +9,19 @@ def ccs_amplicon_param_string():
     config_params = config["STAGE_PARAMS"].get("CCS_AMPLICON", {})
     return " ".join(["--"+" ".join([str(x) for x in i]) for i in config_params.items()])
 
-
 rule ccs_amplicon:
     input:
         ccs_bam = "preprocessor/CCS/{barcode}.bam",
         subreads_bam = "preprocessor/consolidated/{barcode}.bam"
     output:
-        "preprocessor/CCS_Amplicon/{barcode}/haplotypes/{barcode}.fastq",
-        "preprocessor/CCS_Amplicon/{barcode}/clustering/{barcode}.clustering.html"
+        fastq = "preprocessor/CCS_Amplicon/{barcode}/haplotypes/{barcode}.fastq",
+        doc = "preprocessor/CCS_Amplicon/{barcode}/clustering/{barcode}.clustering.html"
     params:
         amplicon_params = ccs_amplicon_param_string()
     conda:
         "../envs/ccs_amplicon.yaml"
     shell:
-        "ccs_amplicon.workflow -d preprocesspr/CCS_Amplicon/{wildcards.barcode} "
+        "ccs_amplicon.workflow -d preprocessor/CCS_Amplicon/{wildcards.barcode} "
         "-p {wildcards.barcode} "
         "{params.amplicon_params} "
         "{input.ccs_bam} {input.subreads_bam}"

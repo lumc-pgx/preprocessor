@@ -9,6 +9,10 @@ ccs:
   threads: 2
   vmem: 6G
 
+ccs_amplicon:
+  threads: 1
+  vmem: 8G
+
 # Parameters for ccs_check
 ccs_check:
   threads: 1

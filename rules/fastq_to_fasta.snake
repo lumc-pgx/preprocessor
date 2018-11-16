@@ -3,9 +3,9 @@ rule fastq_to_fasta:
     Convert fastq to fasta
     """
     input:
-        "{source}.fastq"
+        rules.ccs_amplicon.output.fastq
     output:
-        "{source}.fasta"
+        "preprocessor/CCS_Amplicon/haplotypes/{barcode}.fasta"
     conda:
         "../envs/fastq_to_fasta.yaml"
     shell:

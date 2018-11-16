@@ -7,7 +7,7 @@ onerror: PARAMS.onerror()
 
 # main workflow
 localrules:
-    all, fastq_to_fasta
+    all, fastq_to_fasta, haplotypes
 
 rule all:
     input:
@@ -18,10 +18,12 @@ include: "rules/barcoding.snake"
 include: "rules/merge_subreadset.snake"
 include: "rules/demultiplex.snake"
 include: "rules/consolidate_xml.snake"
-include: "rules/laa.snake"
-include: "rules/laa_summary.snake"
-include: "rules/laa_whitelist.snake"
+#include: "rules/laa.snake"
+#include: "rules/laa_summary.snake"
+#include: "rules/laa_whitelist.snake"
+include: "rules/ccs_amplicon.snake"
 include: "rules/ccs.snake"
-include: "rules/ccs_check.snake"
+#include: "rules/ccs_check.snake"
 include: "rules/fastq_to_fasta.snake"
-include: "rules/ccs_check_summary.snake"
+include: "rules/haplotypes.snake"
+#include: "rules/ccs_check_summary.snake"

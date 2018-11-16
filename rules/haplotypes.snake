@@ -1,0 +1,7 @@
+rule haplotypes:
+    input: 
+        "preprocessor/CCS_Amplicon/{barcode}/haplotypes/barcode.fasta"
+    output:
+        "CCS_Amplicon/haplotypes/{barcode}.fasta"
+    shell:
+        "ln -s {input} {output}"

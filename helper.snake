@@ -6,16 +6,16 @@ class PreprocessingHelper(PipeHelper):
         # determine the files to be generated depending on which stages are to be run
         do_Amplicon = self._config.get("STAGE_PARAMS", {}).get("CCS_AMPLICON", False)
         do_CCS = self._config.get("STAGE_PARAMS", {}).get("CCS", False)
-        do_CCS_check = self._config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
+        #do_CCS_check = self._config.get("STAGE_PARAMS", {}).get("CCS_CHECK", False) and do_LAA and do_CCS
         
         targets = []
         if do_Amplicon:
-            targets += expand("preprocessor/CCS_Amplicon/{barcodes}/haplotypes/{barcodes}.fastq", barcodes=self.barcode_ids)
+            targets += expand("preprocessor/CCS_Amplicon/haplotypes/{barcodes}.fasta", barcodes=self.barcode_ids)
 
-        if do_CCS:
-            targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)
+        #if do_CCS:
+        #    targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)
 
-        if do_CCS_check:
-            targets += expand("preprocessor/summary/ccs_check/{barcodes}.{ext}", barcodes=self.barcode_ids, ext=("html", "csv"))
+        #if do_CCS_check:
+        #    targets += expand("preprocessor/summary/ccs_check/{barcodes}.{ext}", barcodes=self.barcode_ids, ext=("html", "csv"))
 
         return targets
