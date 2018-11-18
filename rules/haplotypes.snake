@@ -1,7 +1,10 @@
 rule haplotypes:
     input: 
-        "preprocessor/CCS_Amplicon/{barcode}/haplotypes/barcode.fasta"
+        a = "preprocessor/CCS_Amplicon/{barcode}/haplotypes/{barcode}.fasta",
+        q = "preprocessor/CCS_Amplicon/{barcode}/haplotypes/{barcode}.fastq"
     output:
-        "CCS_Amplicon/haplotypes/{barcode}.fasta"
+        a = "preprocessor/CCS_Amplicon/haplotypes/{barcode}.fasta",
+        q = "preprocessor/CCS_Amplicon/haplotypes/{barcode}.fastq"
     shell:
-        "ln -s {input} {output}"
+        "ln -sr {input.a} {output.a} && "
+        "ln -sr {input.q} {output.q}"

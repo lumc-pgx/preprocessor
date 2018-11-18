@@ -34,7 +34,8 @@ STAGE_PARAMS:
     tsne-rate: 50
     cluster-percentile: 80
     cluster-inflation: 1.4
-    max-cluster-passes: 500
+    cluster-size-threshold: 0.2
+    cluster-fraction: 0.8
     consensus-fraction: 0.51
     min-haplotype-molecules: 10
     min-variant-qual: 50
