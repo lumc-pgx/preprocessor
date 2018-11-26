@@ -15,8 +15,7 @@ rule ccs_amplicon:
         subreads_bam = "preprocessor/consolidated/{barcode}.bam"
     output:
         fastq = "preprocessor/CCS_Amplicon/{barcode}/haplotypes/{barcode}.fastq",
-        doc = "preprocessor/CCS_Amplicon/{barcode}/clustering/{barcode}.clustering.html",
-        phasing = "preprocessor/CCS_Amplicon/{barcode}/phasing/{barcode}.phasing.tsv"
+        doc = "preprocessor/CCS_Amplicon/{barcode}/phasing/{barcode}.phasing.html",
     params:
         amplicon_params = ccs_amplicon_param_string()
     conda:

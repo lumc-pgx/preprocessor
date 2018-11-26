@@ -11,8 +11,7 @@ class PreprocessingHelper(PipeHelper):
         targets = []
         if do_Amplicon:
             targets += expand("preprocessor/CCS_Amplicon/haplotypes/{barcodes}.fast{fastx}", barcodes=self.barcode_ids, fastx=("a", "q"))
-            targets += expand("preprocessor/CCS_Amplicon/{barcodes}/clustering/{barcodes}.clustering.html", barcodes=self.barcode_ids)
-            targets += expand("preprocessor/CCS_Amplicon/{barcodes}/phasing/{barcodes}.phasing.tsv", barcodes=self.barcode_ids)
+            targets += expand("preprocessor/CCS_Amplicon/{barcodes}/phasing/{barcodes}.phasing.html", barcodes=self.barcode_ids)
 
         #if do_CCS:
         #    targets += expand("preprocessor/CCS/{barcodes}.bam", barcodes=self.barcode_ids)
