@@ -3,7 +3,8 @@
 **Initial data processing for PacBio amplicon data.**  
 
 The preprocessor module performs the following operations:  
-- Combine raw data from multiple SMRT cells associated with a single experiment.
+- Combine raw data from multiple SMRT cells
+- Transparently handle data from both RS2 and Sequel platforms
 - Barcoding
 - Demultiplexing
 - CCS
