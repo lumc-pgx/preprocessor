@@ -19,6 +19,7 @@ STAGE_PARAMS:
     maxLength: 7000
     minPasses: 1
     minPredictedAccuracy: 0.75
+    numThreads: 1
  
   LIMA:
     same: True           # symmetric barcoding
