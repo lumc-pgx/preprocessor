@@ -22,10 +22,6 @@ def ccs_param_string():
     return " ".join(["--"+" ".join([str(x) for x in parse_param([*i])]) for i in config_params.items()])
 
 
-def get_ccs_threads():
-    return config.get("STAGE_PARAMS", {}).get("CCS", {}).get("numThreads", 1)
-
-
 rule ccs:
     """
     Run CCS
@@ -36,7 +32,7 @@ rule ccs:
         bam = "preprocessor/CCS/{barcode}.bam",
         report = "preprocessor/CCS/{barcode}.report.csv"
     threads:
-        get_threads()
+        config.get("STAGE_PARAMS", {}).get("CCS", {}).get("numThreads", 1)
     params:
         ccs_params = ccs_param_string()
     conda:
