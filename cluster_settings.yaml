@@ -5,7 +5,7 @@ __default__:
 
 # parameters specific to CCS
 ccs:
-  threads: 2
+  threads: "{threads}"
   vmem: 6G
 
 # Parameters for barcoding
