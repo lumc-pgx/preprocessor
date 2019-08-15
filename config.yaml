@@ -4,23 +4,29 @@
 # SEQUENCING_PLATFORM must be either RS2 or SEQUEL
 SEQUENCING_PLATFORM: RS2
 
-# Path to the folders which contain the sequencing output for each cell
+# Path to the folders which contain the sequencing output
+# Data from multiple cells can be specified here, in which case they 
+# will be combined
 SOURCE_DATA_PATHS:
-  - /exports/lgtc/equipment/PacBio/rundata/RV-100317_230/A01_1/Analysis_Results 
+  - /path/to/sequencing/data_1
+  - /path/to/sequencing/data_2
+  - /path/to/sequencing/data_n
 
 # Path to barcode fasta file used for demultiplexing
-BARCODES: /exports/lgtc/equipment/PacBio/jobs/000/000206/pacbio-barcodes/barcodes_pacbio_pad_index_1_9_v2/sequence/barcodes_pacbio_pad_index_1_9_v2.fasta  
+BARCODES: /path/to/barcodes/fasta  
 
 # params for individual stages
 # to disable a stage, remove its parameters
 STAGE_PARAMS:
+  # parameters for CCS (refer to the PacBio SMRTLink documentation)
   CCS:
     minLength: 6000
     maxLength: 7000
     minPasses: 1
     minPredictedAccuracy: 0.75
     numThreads: 1
- 
+  
+  # parameters for LIMA (refer to the PacBio SMRTLink documentation)
   LIMA:
     same: True           # symmetric barcoding
     num-threads: 4       # number of threads
