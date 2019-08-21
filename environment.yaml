@@ -6,4 +6,5 @@ dependencies:
   - python=3.5
   - snakemake-minimal=5.3.0
   - pip:
+    - "git+https://github.com/lumc-pgx/locus-processing.git@master#egg=locus_processing"
     - "git+https://github.com/lumc-pgx/pipe-helper.git@master#egg=pipe_helper"
